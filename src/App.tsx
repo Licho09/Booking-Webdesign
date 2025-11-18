@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import Lenis from 'lenis';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
 import { LeadForm } from './components/LeadForm';
@@ -14,6 +15,29 @@ function App() {
       console.log('User is using the scrollbar!', { scrollbarWidth });
     }
   }, [isUsingScrollbar, scrollbarWidth]);
+
+  // Setup smooth scrolling with Lenis
+  useEffect(() => {
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smoothWheel: true,
+      wheelMultiplier: 1,
+      smoothTouch: false,
+      touchMultiplier: 2,
+    });
+
+    function raf(time: number) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+
+    requestAnimationFrame(raf);
+
+    return () => {
+      lenis.destroy();
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-indigo-900 via-purple-900 to-indigo-950 pb-32">
