@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Email Function</title>
+</head>
+<body>
+    <h1>Test Email Function</h1>
+    <button onclick="testEmail()">Test Send Email</button>
+    <div id="result"></div>
+
+    <script>
+        async function testEmail() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Testing...';
+            
+            // Replace these with your actual values
+            const supabaseUrl = prompt('Enter your Supabase URL:');
+            const supabaseKey = prompt('Enter your Supabase Anon Key:');
+            
+            if (!supabaseUrl || !supabaseKey) {
+                resultDiv.innerHTML = '❌ Missing credentials';
+                return;
+            }
+            
+            try {
+                const functionUrl = `${supabaseUrl}/functions/v1/send-email`;
+                console.log('Calling:', functionUrl);
+                
+                const response = await fetch(functionUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${supabaseKey}`,
+                    },
+                    body: JSON.stringify({
+                        email: 'test@example.com', // Change to your email
+                        name: 'Test User',
+                        date: 'Monday, January 1, 2024',
+                        time: '10:00 AM',
+                        businessName: 'Test Business'
+                    }),
+                });
+                
+                const data = await response.json();
+                console.log('Response:', data);
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `✅ Success! Check the console for details. Response: ${JSON.stringify(data, null, 2)}`;
+                } else {
+                    resultDiv.innerHTML = `❌ Error: ${JSON.stringify(data, null, 2)}`;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                resultDiv.innerHTML = `❌ Error: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>
+
+
+
