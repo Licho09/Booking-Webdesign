@@ -36,6 +36,7 @@ export function LeadForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showThankYou, setShowThankYou] = useState(false);
   const [error, setError] = useState('');
+  const [showFormOnMobile, setShowFormOnMobile] = useState(false);
 
   // Generate time slots
   const timeSlots = [
@@ -250,8 +251,20 @@ export function LeadForm() {
       </GradientText>
       <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
         <div className="grid lg:grid-cols-2 gap-0">
-          {/* Left Panel - Event Details */}
-          <div className="bg-white p-8 border-r border-gray-200">
+          {/* Left Panel - Event Details (Form) - Hidden on mobile until Continue is clicked */}
+          <div className={`bg-white p-8 border-r border-gray-200 ${showFormOnMobile ? 'block' : 'hidden lg:block'}`}>
+            {/* Back button for mobile */}
+            {showFormOnMobile && (
+              <button
+                onClick={() => setShowFormOnMobile(false)}
+                className="lg:hidden mb-4 flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+                <span>Back to Calendar</span>
+              </button>
+            )}
             <div className="text-2xl lg:text-3xl font-bold text-red-500 mb-2">Get Started!</div>
             <h3 className="text-2xl font-bold text-gray-900 mb-2">Book Your Free Website Consultation</h3>
             
@@ -328,8 +341,8 @@ export function LeadForm() {
             </form>
           </div>
 
-          {/* Right Panel - Calendar & Time Selection */}
-          <div className="bg-gray-50 p-8">
+          {/* Right Panel - Calendar & Time Selection - Show first on mobile */}
+          <div className={`bg-gray-50 p-8 ${showFormOnMobile ? 'hidden lg:block' : 'block'}`}>
             <div className="mb-6">
               <h4 className="text-lg font-semibold text-gray-900 mb-4">Select Date & Time</h4>
               
@@ -421,6 +434,24 @@ export function LeadForm() {
                   </button>
                 ))}
               </div>
+            </div>
+
+            {/* Continue Button - Only show on mobile when date and time are selected */}
+            <div className="lg:hidden mt-6">
+              <button
+                onClick={() => {
+                  if (selectedTime) {
+                    setShowFormOnMobile(true);
+                  }
+                }}
+                disabled={!selectedTime}
+                className="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-800 text-white font-bold rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:from-purple-700 hover:to-purple-900"
+              >
+                Continue
+              </button>
+              {!selectedTime && (
+                <p className="text-sm text-gray-500 text-center mt-2">Please select a date and time to continue</p>
+              )}
             </div>
           </div>
         </div>
