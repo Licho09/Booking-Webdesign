@@ -38,12 +38,12 @@ export function LeadForm() {
   const [error, setError] = useState('');
   const [showFormOnMobile, setShowFormOnMobile] = useState(false);
 
-  // Generate time slots
+  // Generate time slots (30 minutes apart)
   const timeSlots = [
-    '09:15 AM', '09:30 AM', '09:45 AM', '10:00 AM', '10:15 AM',
-    '10:30 AM', '10:45 AM', '11:00 AM', '11:15 AM', '11:30 AM',
-    '02:00 PM', '02:15 PM', '02:30 PM', '02:45 PM', '03:00 PM',
-    '03:15 PM', '03:30 PM', '03:45 PM', '04:00 PM'
+    '09:00 AM', '09:30 AM', '10:00 AM', '10:30 AM', '11:00 AM',
+    '11:30 AM', '12:00 PM', '12:30 PM', '01:00 PM', '01:30 PM',
+    '02:00 PM', '02:30 PM', '03:00 PM', '03:30 PM', '04:00 PM',
+    '04:30 PM', '05:00 PM', '05:30 PM'
   ];
 
   // Get days in month
@@ -418,41 +418,51 @@ export function LeadForm() {
             {/* Time Slots */}
             <div className="max-h-64 overflow-y-auto">
               <div className="space-y-2">
-                {timeSlots.map((time) => (
-                  <button
-                    key={time}
-                    onClick={() => setSelectedTime(time)}
-                    className={`
-                      w-full px-4 py-2.5 rounded-lg font-medium transition-all text-sm
-                      ${selectedTime === time
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-white text-blue-600 border border-blue-200 hover:bg-blue-50'
-                      }
-                    `}
-                  >
-                    {time}
-                  </button>
-                ))}
+                {timeSlots.map((time) => {
+                  const isSelected = selectedTime === time;
+                  return (
+                    <div key={time} className="relative">
+                      {/* Mobile: Split animation when selected */}
+                      {isSelected ? (
+                        <>
+                          <div className="lg:hidden time-split-container flex h-10 rounded-lg overflow-hidden relative">
+                            {/* Left half - Selected time (shrinks from right) */}
+                            <div 
+                              className="time-split-left bg-blue-600 text-white flex items-center justify-center font-medium text-sm rounded-l-lg"
+                            >
+                              {time}
+                            </div>
+                            {/* Right half - Next button (grows from right) */}
+                            <button
+                              onClick={() => setShowFormOnMobile(true)}
+                              className="time-split-right bg-gradient-to-r from-purple-600 to-purple-800 text-white font-bold text-sm hover:from-purple-700 hover:to-purple-900 rounded-r-lg"
+                            >
+                              Next
+                            </button>
+                          </div>
+                          {/* Desktop: Show selected state normally */}
+                          <button
+                            onClick={() => setSelectedTime(time)}
+                            className="hidden lg:block w-full px-4 py-2.5 rounded-lg font-medium text-sm bg-blue-600 text-white transition-all"
+                          >
+                            {time}
+                          </button>
+                        </>
+                      ) : (
+                        // Regular time button (when not selected - both mobile and desktop)
+                        <button
+                          onClick={() => setSelectedTime(time)}
+                          className="w-full px-4 py-2.5 rounded-lg font-medium transition-all text-sm bg-white text-blue-600 border border-blue-200 hover:bg-blue-50"
+                        >
+                          {time}
+                        </button>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
-            {/* Continue Button - Only show on mobile when date and time are selected */}
-            <div className="lg:hidden mt-6">
-              <button
-                onClick={() => {
-                  if (selectedTime) {
-                    setShowFormOnMobile(true);
-                  }
-                }}
-                disabled={!selectedTime}
-                className="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-800 text-white font-bold rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:from-purple-700 hover:to-purple-900"
-              >
-                Continue
-              </button>
-              {!selectedTime && (
-                <p className="text-sm text-gray-500 text-center mt-2">Please select a date and time to continue</p>
-              )}
-            </div>
           </div>
         </div>
       </div>

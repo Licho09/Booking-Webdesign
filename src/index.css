@@ -55,3 +55,44 @@ html.lenis body {
 .submit-button:disabled:hover::before {
   transform: scaleX(0);
 }
+
+/* Time button split animation */
+@keyframes shrinkFromRight {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 50%;
+  }
+}
+
+@keyframes growFromRight {
+  from {
+    width: 0%;
+    opacity: 0;
+    transform: scaleX(0);
+  }
+  to {
+    width: 50%;
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+.time-split-container {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+}
+
+.time-split-left {
+  animation: shrinkFromRight 0.5s ease-in-out forwards;
+  transform-origin: right center;
+  flex-shrink: 0;
+}
+
+.time-split-right {
+  animation: growFromRight 0.5s ease-in-out forwards;
+  transform-origin: left center;
+  flex-shrink: 0;
+}
