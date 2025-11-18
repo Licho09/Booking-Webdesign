@@ -245,11 +245,11 @@ export function LeadForm() {
         colors={["#40ffaa", "#4079ff", "#40ffaa", "#4079ff", "#40ffaa"]}
         animationSpeed={3}
         showBorder={false}
-        className="mb-6 text-center"
+        className="mb-6 text-center fade-in-slide-up-delay-3"
       >
         <span className="text-5xl lg:text-6xl xl:text-7xl">BOOK NOW!</span>
       </GradientText>
-      <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-2xl overflow-hidden slide-up">
         <div className="grid lg:grid-cols-2 gap-0">
           {/* Left Panel - Event Details (Form) - Hidden on mobile until Continue is clicked */}
           <div className={`bg-white p-8 border-r border-gray-200 ${showFormOnMobile ? 'block' : 'hidden lg:block'}`}>
@@ -425,7 +425,7 @@ export function LeadForm() {
                       {/* Mobile: Split animation when selected */}
                       {isSelected ? (
                         <>
-                          <div className="lg:hidden time-split-container flex h-10 rounded-lg overflow-hidden relative">
+                          <div className="lg:hidden time-split-container flex h-10 rounded-lg overflow-visible relative gap-1">
                             {/* Left half - Selected time (shrinks from right) */}
                             <div 
                               className="time-split-left bg-blue-600 text-white flex items-center justify-center font-medium text-sm rounded-l-lg"

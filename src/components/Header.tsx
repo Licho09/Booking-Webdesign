@@ -4,7 +4,7 @@ export function Header() {
       <div className="text-white text-4xl font-bold" style={{
         textShadow: '0 0 20px rgba(168, 85, 247, 0.8), 0 0 40px rgba(168, 85, 247, 0.6), 0 0 60px rgba(168, 85, 247, 0.4)'
       }}>
-        DesignLabs
+        <span className="fade-in-slide-up">DesignLabs</span>
       </div>
     </header>
   );
