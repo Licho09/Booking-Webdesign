@@ -4,6 +4,9 @@ import { Header } from './components/Header';
 import { Hero } from './components/Hero';
 import { LeadForm } from './components/LeadForm';
 import { Services } from './components/Services';
+import { DesignSection } from './components/DesignSection';
+import { LeadsSection } from './components/LeadsSection';
+import { ToolsSection } from './components/ToolsSection';
 import CurvedLoop from './components/CurvedLoop';
 import { useScrollbarDetection } from './hooks/useScrollbarDetection';
 
@@ -46,6 +49,9 @@ function App() {
         <Hero />
         <LeadForm />
         <Services />
+        <DesignSection />
+        <LeadsSection />
+        <ToolsSection />
         <div className="py-16">
           <CurvedLoop 
             marqueeText="Clients ✦ Sales ✦ Leads ✦ Bookings ✦ Growth ✦"

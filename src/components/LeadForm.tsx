@@ -3,6 +3,7 @@ import { CheckCircle, Clock, Calendar } from 'lucide-react';
 import GradientText from './GradientText';
 import { supabase } from '../lib/supabase';
 import { sendEmailConfirmation } from '../lib/sendEmail';
+import { sendOwnerNotification } from '../lib/sendOwnerNotification';
 
 export interface Lead {
   id?: string;
@@ -80,14 +81,15 @@ export function LeadForm() {
 
     // Send email confirmation FIRST (before database save)
     // This way email sends even if database fails
+    const dateString = selectedDate.toLocaleDateString('en-US', { 
+      weekday: 'long', 
+      month: 'long', 
+      day: 'numeric', 
+      year: 'numeric' 
+    });
+
     if (formData.email.trim()) {
       try {
-        const dateString = selectedDate.toLocaleDateString('en-US', { 
-          weekday: 'long', 
-          month: 'long', 
-          day: 'numeric', 
-          year: 'numeric' 
-        });
         await sendEmailConfirmation(
           formData.email.trim(),
           formData.name.trim(),
@@ -99,6 +101,21 @@ export function LeadForm() {
         // Don't block form submission if email fails
         console.error('Failed to send email confirmation:', emailError);
       }
+    }
+
+    // Send SMS notification to owner
+    try {
+      await sendOwnerNotification(
+        formData.name.trim(),
+        formData.email.trim(),
+        formData.phone.trim() || undefined,
+        formData.businessName.trim(),
+        dateString,
+        selectedTime
+      );
+    } catch (notificationError) {
+      // Don't block form submission if notification fails
+      console.error('Failed to send owner notification:', notificationError);
     }
 
     try {
