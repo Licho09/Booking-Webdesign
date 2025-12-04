@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import Lenis from 'lenis';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
@@ -7,10 +8,12 @@ import { Services } from './components/Services';
 import { DesignSection } from './components/DesignSection';
 import { LeadsSection } from './components/LeadsSection';
 import { ToolsSection } from './components/ToolsSection';
+import { ThankYou } from './components/ThankYou';
 import CurvedLoop from './components/CurvedLoop';
 import { useScrollbarDetection } from './hooks/useScrollbarDetection';
+import { trackPageView } from './lib/analytics';
 
-function App() {
+function HomePage() {
   const { isUsingScrollbar, scrollbarWidth } = useScrollbarDetection();
 
   useEffect(() => {
@@ -63,6 +66,22 @@ function App() {
         </div>
       </main>
     </div>
+  );
+}
+
+function App() {
+  const location = useLocation();
+
+  // Track page views on route changes
+  useEffect(() => {
+    trackPageView(location.pathname, document.title);
+  }, [location]);
+
+  return (
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/thank-you" element={<ThankYou />} />
+    </Routes>
   );
 }
 

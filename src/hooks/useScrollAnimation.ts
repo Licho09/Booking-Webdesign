@@ -35,3 +35,6 @@ export function useScrollAnimation() {
   return { ref, isVisible };
 }
 
+
+
+

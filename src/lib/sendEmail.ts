@@ -84,7 +84,7 @@ export async function sendEmailConfirmation(
 
     console.log('✅ Email sent successfully!', data);
     console.log('📧 Email sent to:', email);
-    console.log('📧 Email sent from:', 'onboarding@resend.dev');
+    console.log('📧 Email sent from: info@designcxlabs.com');
     console.log('📧 Check your inbox and spam folder!');
     return { success: true };
   } catch (error) {

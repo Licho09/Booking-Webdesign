@@ -18,6 +18,7 @@ serve(async (req) => {
   // Handle CORS
   if (req.method === 'OPTIONS') {
     return new Response(null, {
+      status: 200,
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'POST, OPTIONS',
@@ -27,10 +28,24 @@ serve(async (req) => {
   }
 
   try {
-    // Verify environment variables
+    // Verify environment variables - make it optional so it doesn't fail if not configured
     if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN || !TWILIO_PHONE_NUMBER || !OWNER_PHONE) {
-      console.error('Missing Twilio credentials or owner phone number');
-      throw new Error('SMS notification service not configured');
+      console.warn('SMS notification service not configured - skipping SMS notification');
+      // Return success but log that SMS was skipped
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          message: 'SMS notification skipped (not configured)',
+          skipped: true
+        }),
+        {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+          },
+        }
+      );
     }
 
     const { name, email, phone, businessName, date, time }: NotificationRequest = await req.json();
@@ -112,4 +127,5 @@ serve(async (req) => {
     );
   }
 });
+
 

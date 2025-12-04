@@ -1,9 +1,20 @@
-import { useState, FormEvent } from 'react';
-import { CheckCircle, Clock, Calendar } from 'lucide-react';
+import { useState, FormEvent, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Clock, Calendar } from 'lucide-react';
 import GradientText from './GradientText';
 import { supabase } from '../lib/supabase';
 import { sendEmailConfirmation } from '../lib/sendEmail';
 import { sendOwnerNotification } from '../lib/sendOwnerNotification';
+import {
+  trackFormView,
+  trackFormStart,
+  trackFormFieldInteraction,
+  trackFormSubmitAttempt,
+  trackFormSubmitSuccess,
+  trackFormSubmitError,
+  trackDateSelection,
+  trackTimeSelection,
+} from '../lib/analytics';
 
 export interface Lead {
   id?: string;
@@ -18,6 +29,7 @@ export interface Lead {
 }
 
 export function LeadForm() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -35,9 +47,14 @@ export function LeadForm() {
   const [selectedDate, setSelectedDate] = useState<Date>(getInitialDate());
   const [selectedTime, setSelectedTime] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showThankYou, setShowThankYou] = useState(false);
   const [error, setError] = useState('');
   const [showFormOnMobile, setShowFormOnMobile] = useState(false);
+  const [hasStartedForm, setHasStartedForm] = useState(false);
+
+  // Track form view when component mounts
+  useEffect(() => {
+    trackFormView();
+  }, []);
 
   // Generate time slots (30 minutes apart)
   const timeSlots = [
@@ -72,8 +89,11 @@ export function LeadForm() {
     e.preventDefault();
     setError('');
 
+    trackFormSubmitAttempt();
+
     if (!formData.name || !formData.email || !formData.phone || !formData.businessName || !selectedTime) {
       setError('Please fill in all fields and select a time.');
+      trackFormSubmitError('missing_fields');
       return;
     }
 
@@ -88,15 +108,21 @@ export function LeadForm() {
       year: 'numeric' 
     });
 
+    let emailSent = false;
     if (formData.email.trim()) {
       try {
-        await sendEmailConfirmation(
+        const emailResult = await sendEmailConfirmation(
           formData.email.trim(),
           formData.name.trim(),
           dateString,
           selectedTime,
           formData.businessName.trim() || undefined
         );
+        emailSent = emailResult.success;
+        if (!emailResult.success) {
+          console.error('Failed to send email confirmation:', emailResult.error);
+          // Log but don't block - email might still be sent
+        }
       } catch (emailError) {
         // Don't block form submission if email fails
         console.error('Failed to send email confirmation:', emailError);
@@ -149,22 +175,33 @@ export function LeadForm() {
     } catch (err) {
       // Database errors won't block the form - email was already sent
       console.warn('Error saving to database (email was sent):', err);
+      trackFormSubmitError('database_error');
     }
 
-    setShowThankYou(true);
-    setFormData({
-      name: '',
-      email: '',
-      phone: '',
-      businessName: '',
+    // Track successful submission
+    trackFormSubmitSuccess({
+      hasDate: !!selectedDate,
+      hasTime: !!selectedTime,
+      hasBusinessName: !!formData.businessName,
     });
-    setSelectedTime('');
+
+    // Navigate to thank you page
     setIsSubmitting(false);
+    navigate('/thank-you');
   };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
+    // Track form start on first field interaction
+    if (!hasStartedForm) {
+      setHasStartedForm(true);
+      trackFormStart();
+    }
+    
+    // Track field interaction
+    trackFormFieldInteraction(e.target.name);
+    
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -179,8 +216,14 @@ export function LeadForm() {
       // Check if the date is within the allowed range (tomorrow + 3 more days)
       if (isDateAvailable(newDate)) {
         setSelectedDate(newDate);
+        trackDateSelection(newDate.toLocaleDateString());
       }
     }
+  };
+
+  const handleTimeClick = (time: string) => {
+    setSelectedTime(time);
+    trackTimeSelection(time);
   };
 
   // Check if a date is available (tomorrow + next 3 days)
@@ -237,24 +280,6 @@ export function LeadForm() {
       }
     }
   };
-
-  if (showThankYou) {
-    return (
-      <div className="bg-white rounded-2xl p-8 shadow-xl text-center max-w-md mx-auto">
-        <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-        <h3 className="text-2xl font-bold text-gray-900 mb-3">Thanks — request sent!</h3>
-        <p className="text-gray-600 mb-6">
-          Your call has been scheduled. We'll send you a confirmation email shortly.
-        </p>
-        <button
-          onClick={() => setShowThankYou(false)}
-          className="border-2 border-blue-600 text-blue-600 px-6 py-3 rounded-xl font-bold hover:bg-blue-50 transition-all"
-        >
-          Close
-        </button>
-      </div>
-    );
-  }
 
   return (
     <section id="offer" className="max-w-5xl mx-auto px-8 py-8">
@@ -459,7 +484,7 @@ export function LeadForm() {
                           </div>
                           {/* Desktop: Show selected state normally */}
                           <button
-                            onClick={() => setSelectedTime(time)}
+                            onClick={() => handleTimeClick(time)}
                             className="hidden lg:block w-full px-4 py-2.5 rounded-lg font-medium text-sm bg-blue-600 text-white transition-all"
                           >
                             {time}
@@ -468,7 +493,7 @@ export function LeadForm() {
                       ) : (
                         // Regular time button (when not selected - both mobile and desktop)
                         <button
-                          onClick={() => setSelectedTime(time)}
+                          onClick={() => handleTimeClick(time)}
                           className="w-full px-4 py-2.5 rounded-lg font-medium transition-all text-sm bg-white text-blue-600 border border-blue-200 hover:bg-blue-50"
                         >
                           {time}

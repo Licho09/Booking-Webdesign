@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Resend Email</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-top: 0;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test Resend Email</h1>
+        <p>This will test sending an email through your Supabase Edge Function using Resend.</p>
+        
+        <div class="form-group">
+            <label for="supabaseUrl">Supabase URL:</label>
+            <input type="text" id="supabaseUrl" placeholder="https://xxxxx.supabase.co" value="">
+        </div>
+        
+        <div class="form-group">
+            <label for="supabaseKey">Supabase Anon Key:</label>
+            <input type="text" id="supabaseKey" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." value="">
+        </div>
+        
+        <div class="form-group">
+            <label for="testEmail">Your Email (to receive test):</label>
+            <input type="email" id="testEmail" placeholder="luischirinos1000@gmail.com" value="luischirinos1000@gmail.com">
+        </div>
+        
+        <button onclick="testEmail()" id="testBtn">Send Test Email</button>
+        
+        <div id="result"></div>
+    </div>
+
+    <script>
+        async function testEmail() {
+            const resultDiv = document.getElementById('result');
+            const testBtn = document.getElementById('testBtn');
+            const supabaseUrl = document.getElementById('supabaseUrl').value.trim();
+            const supabaseKey = document.getElementById('supabaseKey').value.trim();
+            const testEmail = document.getElementById('testEmail').value.trim();
+            
+            // Validate inputs
+            if (!supabaseUrl || !supabaseKey || !testEmail) {
+                showResult('Please fill in all fields', 'error');
+                return;
+            }
+            
+            // Disable button
+            testBtn.disabled = true;
+            testBtn.textContent = 'Sending...';
+            resultDiv.style.display = 'none';
+            
+            try {
+                const functionUrl = `${supabaseUrl}/functions/v1/send-email`;
+                console.log('Calling:', functionUrl);
+                
+                const response = await fetch(functionUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${supabaseKey}`,
+                        'apikey': supabaseKey,
+                    },
+                    body: JSON.stringify({
+                        email: testEmail,
+                        name: 'Test User',
+                        date: new Date().toLocaleDateString('en-US', { 
+                            weekday: 'long', 
+                            month: 'long', 
+                            day: 'numeric', 
+                            year: 'numeric' 
+                        }),
+                        time: new Date().toLocaleTimeString('en-US', { 
+                            hour: 'numeric', 
+                            minute: '2-digit',
+                            hour12: true 
+                        }),
+                        businessName: 'Test Business - DesignCXLabs'
+                    }),
+                });
+                
+                const data = await response.json();
+                console.log('Response:', data);
+                
+                if (response.ok) {
+                    showResult(
+                        `✅ Success! Email sent to ${testEmail}<br><br>` +
+                        `Check your inbox (and spam folder).<br>` +
+                        `Email ID: ${data.emailId || 'N/A'}`,
+                        'success'
+                    );
+                } else {
+                    let errorMsg = `❌ Error: ${data.error || 'Unknown error'}`;
+                    if (data.details) {
+                        errorMsg += `<br><br>Details: <code>${data.details}</code>`;
+                    }
+                    showResult(errorMsg, 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showResult(`❌ Network Error: ${error.message}`, 'error');
+            } finally {
+                testBtn.disabled = false;
+                testBtn.textContent = 'Send Test Email';
+            }
+        }
+        
+        function showResult(message, type) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = message;
+            resultDiv.className = type;
+            resultDiv.style.display = 'block';
+        }
+        
+        // Load from localStorage if available
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedUrl = localStorage.getItem('supabaseUrl');
+            const savedKey = localStorage.getItem('supabaseKey');
+            if (savedUrl) document.getElementById('supabaseUrl').value = savedUrl;
+            if (savedKey) document.getElementById('supabaseKey').value = savedKey;
+        });
+        
+        // Save to localStorage
+        document.getElementById('supabaseUrl').addEventListener('change', (e) => {
+            localStorage.setItem('supabaseUrl', e.target.value);
+        });
+        document.getElementById('supabaseKey').addEventListener('change', (e) => {
+            localStorage.setItem('supabaseKey', e.target.value);
+        });
+    </script>
+</body>
+</html>
+
+
+
