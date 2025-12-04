@@ -1,0 +1,5 @@
+# Render redirects file
+# This ensures static files are served before React Router handles routes
+
+/sitemap.xml  /sitemap.xml  200
+
