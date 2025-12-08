@@ -11,7 +11,7 @@ export async function sendOwnerNotification(
   // Owner notification is now handled automatically by send-email function
   // No need to call a separate function
   console.log('ℹ️ Owner notification is sent automatically with customer confirmation email');
-  return { success: true };
+    return { success: true };
 }
 
 

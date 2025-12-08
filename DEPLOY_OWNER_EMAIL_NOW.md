@@ -77,3 +77,5 @@ Make sure these secrets exist:
 
 The most important step is **deploying the function** - that's why you're getting the CORS error!
 
+
+

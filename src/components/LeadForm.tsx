@@ -26,6 +26,8 @@ export interface Lead {
   notes?: string;
   created_at?: string;
   status?: string;
+  booking_date?: string;
+  booking_time?: string;
 }
 
 export function LeadForm() {
@@ -50,11 +52,68 @@ export function LeadForm() {
   const [error, setError] = useState('');
   const [showFormOnMobile, setShowFormOnMobile] = useState(false);
   const [hasStartedForm, setHasStartedForm] = useState(false);
+  const [bookedSlots, setBookedSlots] = useState<Set<string>>(new Set());
+  const [loadingBookings, setLoadingBookings] = useState(false);
 
   // Track form view when component mounts
   useEffect(() => {
     trackFormView();
   }, []);
+
+  // Fetch booked time slots when date changes
+  useEffect(() => {
+    const fetchBookedSlots = async () => {
+      if (!supabase) {
+        // Fallback: check localStorage for bookings
+        const saved = JSON.parse(localStorage.getItem('leads') || '[]');
+        const dateStr = selectedDate.toISOString().split('T')[0];
+        const booked = new Set<string>();
+        saved.forEach((lead: any) => {
+          if (lead.booking_date === dateStr && lead.booking_time) {
+            booked.add(lead.booking_time);
+          }
+        });
+        setBookedSlots(booked);
+        // Clear selected time if it's now booked
+        if (selectedTime && booked.has(selectedTime)) {
+          setSelectedTime('');
+        }
+        return;
+      }
+
+      setLoadingBookings(true);
+      try {
+        const dateStr = selectedDate.toISOString().split('T')[0];
+        const { data, error } = await supabase
+          .from('leads')
+          .select('booking_time')
+          .eq('booking_date', dateStr)
+          .not('booking_time', 'is', null);
+
+        if (error) {
+          console.warn('Error fetching bookings:', error);
+          setBookedSlots(new Set());
+        } else {
+          const booked = new Set<string>(
+            (data || []).map((booking) => booking.booking_time).filter(Boolean)
+          );
+          setBookedSlots(booked);
+          // Clear selected time if it's now booked
+          if (selectedTime && booked.has(selectedTime)) {
+            setSelectedTime('');
+          }
+        }
+      } catch (err) {
+        console.warn('Error fetching bookings:', err);
+        setBookedSlots(new Set());
+      } finally {
+        setLoadingBookings(false);
+      }
+    };
+
+    fetchBookedSlots();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedDate]);
 
   // Generate time slots (30 minutes apart)
   const timeSlots = [
@@ -97,10 +156,42 @@ export function LeadForm() {
       return;
     }
 
+    // Check if the selected time slot is already booked
+    const dateStr = selectedDate.toISOString().split('T')[0];
+    if (bookedSlots.has(selectedTime)) {
+      setError('This time slot is already booked. Please select another time.');
+      trackFormSubmitError('time_slot_taken');
+      return;
+    }
+
+    // Double-check with database before submitting
+    if (supabase) {
+      try {
+        const { data, error: checkError } = await supabase
+          .from('leads')
+          .select('id')
+          .eq('booking_date', dateStr)
+          .eq('booking_time', selectedTime)
+          .limit(1);
+
+        if (checkError) {
+          console.warn('Error checking booking availability:', checkError);
+        } else if (data && data.length > 0) {
+          setError('This time slot was just booked by someone else. Please select another time.');
+          trackFormSubmitError('time_slot_taken');
+          // Refresh booked slots
+          const booked = new Set(bookedSlots);
+          booked.add(selectedTime);
+          setBookedSlots(booked);
+          return;
+        }
+      } catch (err) {
+        console.warn('Error checking booking availability:', err);
+      }
+    }
+
     setIsSubmitting(true);
 
-    // Send email confirmation FIRST (before database save)
-    // This way email sends even if database fails
     const dateString = selectedDate.toLocaleDateString('en-US', { 
       weekday: 'long', 
       month: 'long', 
@@ -108,6 +199,94 @@ export function LeadForm() {
       year: 'numeric' 
     });
 
+    let bookingId: string | null = null;
+
+    // Save to database first to get booking ID
+    try {
+      const lead: Lead = {
+        name: formData.name.trim(),
+        business: formData.businessName.trim() || 'Website Project',
+        email: formData.email.trim(),
+        phone: formData.phone.trim() || undefined,
+        notes: `Scheduled call: ${selectedDate.toLocaleDateString()} at ${selectedTime}${formData.businessName ? ` | Business: ${formData.businessName}` : ''}`,
+        created_at: new Date().toISOString(),
+        booking_date: dateStr,
+        booking_time: selectedTime,
+      };
+
+      // Try Supabase if available, otherwise use localStorage
+      if (supabase) {
+        const { error: supabaseError } = await supabase.from('leads').insert([lead]);
+        if (supabaseError) {
+          // Check if it's a unique constraint violation (double booking)
+          if (supabaseError.code === '23505' || supabaseError.message.includes('unique') || supabaseError.message.includes('duplicate')) {
+            setError('This time slot was just booked by someone else. Please select another time.');
+            trackFormSubmitError('time_slot_taken');
+            setIsSubmitting(false);
+            // Refresh booked slots
+            const booked = new Set(bookedSlots);
+            booked.add(selectedTime);
+            setBookedSlots(booked);
+            return;
+          }
+          console.warn('Database save failed, trying localStorage fallback:', supabaseError);
+          // Fallback to localStorage if Supabase fails
+          const saved = JSON.parse(localStorage.getItem('leads') || '[]');
+          const tempId = `local-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+          lead.id = tempId;
+          saved.push(lead);
+          localStorage.setItem('leads', JSON.stringify(saved));
+          bookingId = tempId;
+          console.log('Lead saved to localStorage as fallback:', lead);
+          console.log('📋 Booking ID (localStorage):', bookingId);
+        } else {
+          // Successfully saved - query for the booking ID using email + date + time
+          console.log('📋 Querying for booking ID with:', { email: lead.email, date: dateStr, time: selectedTime });
+          const { data: bookingData, error: queryError } = await supabase
+            .from('leads')
+            .select('id')
+            .eq('email', lead.email)
+            .eq('booking_date', dateStr)
+            .eq('booking_time', selectedTime)
+            .order('created_at', { ascending: false })
+            .limit(1);
+          
+          if (queryError) {
+            console.warn('⚠️ Error querying for booking ID:', queryError);
+          } else if (bookingData && bookingData.length > 0 && bookingData[0].id) {
+            bookingId = bookingData[0].id;
+            console.log('📋 Booking ID captured:', bookingId);
+          } else {
+            console.warn('⚠️ No booking ID found after insert');
+          }
+          
+          // Add to booked slots
+          const booked = new Set(bookedSlots);
+          booked.add(selectedTime);
+          setBookedSlots(booked);
+        }
+      } else {
+        // Fallback to localStorage for frontend-only mode
+        const saved = JSON.parse(localStorage.getItem('leads') || '[]');
+        const tempId = `local-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        lead.id = tempId;
+        saved.push(lead);
+        localStorage.setItem('leads', JSON.stringify(saved));
+        bookingId = tempId;
+        console.log('Lead saved to localStorage:', lead);
+        // Add to booked slots
+        const booked = new Set(bookedSlots);
+        booked.add(selectedTime);
+        setBookedSlots(booked);
+      }
+    } catch (err) {
+      console.warn('Error saving to database:', err);
+      trackFormSubmitError('database_error');
+      // Continue anyway - we'll send email without booking ID
+    }
+
+    // Send email confirmation with booking ID (if available)
+    console.log('📧 Sending email with booking ID:', bookingId);
     let emailSent = false;
     if (formData.email.trim()) {
       try {
@@ -116,15 +295,14 @@ export function LeadForm() {
           formData.name.trim(),
           dateString,
           selectedTime,
-          formData.businessName.trim() || undefined
+          formData.businessName.trim() || undefined,
+          bookingId || undefined
         );
         emailSent = emailResult.success;
         if (!emailResult.success) {
           console.error('Failed to send email confirmation:', emailResult.error);
-          // Log but don't block - email might still be sent
         }
       } catch (emailError) {
-        // Don't block form submission if email fails
         console.error('Failed to send email confirmation:', emailError);
       }
     }
@@ -140,42 +318,7 @@ export function LeadForm() {
         selectedTime
       );
     } catch (notificationError) {
-      // Don't block form submission if notification fails
       console.error('Failed to send owner notification:', notificationError);
-    }
-
-    try {
-      const lead: Lead = {
-        name: formData.name.trim(),
-        business: formData.businessName.trim() || 'Website Project',
-        email: formData.email.trim(),
-        phone: formData.phone.trim() || undefined,
-        notes: `Scheduled call: ${selectedDate.toLocaleDateString()} at ${selectedTime}${formData.businessName ? ` | Business: ${formData.businessName}` : ''}`,
-        created_at: new Date().toISOString(),
-      };
-
-      // Try Supabase if available, otherwise use localStorage
-      if (supabase) {
-        const { error: supabaseError } = await supabase.from('leads').insert([lead]);
-        if (supabaseError) {
-          console.warn('Database save failed (this is okay, email was sent):', supabaseError);
-          // Fallback to localStorage if Supabase fails
-          const saved = JSON.parse(localStorage.getItem('leads') || '[]');
-          saved.push(lead);
-          localStorage.setItem('leads', JSON.stringify(saved));
-          console.log('Lead saved to localStorage as fallback:', lead);
-        }
-      } else {
-        // Fallback to localStorage for frontend-only mode
-        const saved = JSON.parse(localStorage.getItem('leads') || '[]');
-        saved.push(lead);
-        localStorage.setItem('leads', JSON.stringify(saved));
-        console.log('Lead saved to localStorage:', lead);
-      }
-    } catch (err) {
-      // Database errors won't block the form - email was already sent
-      console.warn('Error saving to database (email was sent):', err);
-      trackFormSubmitError('database_error');
     }
 
     // Track successful submission
@@ -459,9 +602,13 @@ export function LeadForm() {
 
             {/* Time Slots */}
             <div className="max-h-64 overflow-y-auto">
+              {loadingBookings && (
+                <div className="text-sm text-gray-500 text-center py-2">Checking availability...</div>
+              )}
               <div className="space-y-2">
                 {timeSlots.map((time) => {
                   const isSelected = selectedTime === time;
+                  const isBooked = bookedSlots.has(time);
                   return (
                     <div key={time} className="relative">
                       {/* Mobile: Split animation when selected */}
@@ -484,8 +631,9 @@ export function LeadForm() {
                           </div>
                           {/* Desktop: Show selected state normally */}
                           <button
-                            onClick={() => handleTimeClick(time)}
-                            className="hidden lg:block w-full px-4 py-2.5 rounded-lg font-medium text-sm bg-blue-600 text-white transition-all"
+                            onClick={() => !isBooked && handleTimeClick(time)}
+                            disabled={isBooked}
+                            className="hidden lg:block w-full px-4 py-2.5 rounded-lg font-medium text-sm bg-blue-600 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             {time}
                           </button>
@@ -493,10 +641,16 @@ export function LeadForm() {
                       ) : (
                         // Regular time button (when not selected - both mobile and desktop)
                         <button
-                          onClick={() => handleTimeClick(time)}
-                          className="w-full px-4 py-2.5 rounded-lg font-medium transition-all text-sm bg-white text-blue-600 border border-blue-200 hover:bg-blue-50"
+                          onClick={() => !isBooked && handleTimeClick(time)}
+                          disabled={isBooked}
+                          className={`w-full px-4 py-2.5 rounded-lg font-medium transition-all text-sm ${
+                            isBooked
+                              ? 'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed line-through'
+                              : 'bg-white text-blue-600 border border-blue-200 hover:bg-blue-50'
+                          }`}
+                          title={isBooked ? 'This time slot is already booked' : ''}
                         >
-                          {time}
+                          {time} {isBooked && '(Booked)'}
                         </button>
                       )}
                     </div>

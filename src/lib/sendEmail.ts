@@ -8,7 +8,8 @@ export async function sendEmailConfirmation(
   name: string,
   date: string,
   time: string,
-  businessName?: string
+  businessName?: string,
+  bookingId?: string
 ): Promise<{ success: boolean; error?: string }> {
   console.log('📧 Attempting to send email confirmation...');
   
@@ -19,7 +20,10 @@ export async function sendEmailConfirmation(
   }
 
   try {
-    console.log('📝 Email data:', { email, name, date, time, businessName });
+    console.log('📝 Email data:', { email, name, date, time, businessName, bookingId });
+    console.log('📋 Booking ID value:', bookingId);
+    console.log('📋 Booking ID type:', typeof bookingId);
+    console.log('📋 Booking ID truthy?', !!bookingId);
     
     // Get the Supabase URL and anon key for direct fetch
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -33,15 +37,21 @@ export async function sendEmailConfirmation(
     const functionUrl = `${supabaseUrl}/functions/v1/send-email`;
     console.log('📤 Calling function URL:', functionUrl);
     
+    // Prepare request body - explicitly include bookingId even if undefined
+    const requestBody: any = {
+      email,
+      name,
+      date,
+      time,
+    };
+    if (businessName) requestBody.businessName = businessName;
+    if (bookingId) requestBody.bookingId = bookingId;
+    
+    console.log('📤 Request body being sent:', JSON.stringify(requestBody, null, 2));
+    
     // Try using supabase.functions.invoke first
     const { data, error } = await supabase.functions.invoke('send-email', {
-      body: {
-        email,
-        name,
-        date,
-        time,
-        businessName,
-      },
+      body: requestBody,
     });
 
     if (error) {
@@ -58,13 +68,7 @@ export async function sendEmailConfirmation(
             'Authorization': `Bearer ${supabaseAnonKey}`,
             'apikey': supabaseAnonKey,
           },
-          body: JSON.stringify({
-            email,
-            name,
-            date,
-            time,
-            businessName,
-          }),
+          body: JSON.stringify(requestBody),
         });
         
         const responseData = await response.json();

@@ -18,4 +18,6 @@ export interface Lead {
   notes?: string;
   created_at?: string;
   status?: string;
+  booking_date?: string;
+  booking_time?: string;
 }

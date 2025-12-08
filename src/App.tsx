@@ -9,6 +9,8 @@ import { DesignSection } from './components/DesignSection';
 import { LeadsSection } from './components/LeadsSection';
 import { ToolsSection } from './components/ToolsSection';
 import { ThankYou } from './components/ThankYou';
+import { CancelBooking } from './components/CancelBooking';
+import { RescheduleBooking } from './components/RescheduleBooking';
 import CurvedLoop from './components/CurvedLoop';
 import { useScrollbarDetection } from './hooks/useScrollbarDetection';
 import { trackPageView } from './lib/analytics';
@@ -72,15 +74,27 @@ function HomePage() {
 function App() {
   const location = useLocation();
 
+  // Normalize pathname to handle double slashes
+  const normalizedPathname = location.pathname.replace(/\/+/g, '/');
+
   // Track page views on route changes
   useEffect(() => {
-    trackPageView(location.pathname, document.title);
-  }, [location]);
+    trackPageView(normalizedPathname, document.title);
+  }, [normalizedPathname]);
+
+  // Redirect if pathname has double slashes
+  useEffect(() => {
+    if (location.pathname !== normalizedPathname) {
+      window.history.replaceState({}, '', normalizedPathname + location.search);
+    }
+  }, [location.pathname, normalizedPathname, location.search]);
 
   return (
-    <Routes>
+    <Routes location={{ ...location, pathname: normalizedPathname }}>
       <Route path="/" element={<HomePage />} />
       <Route path="/thank-you" element={<ThankYou />} />
+      <Route path="/cancel" element={<CancelBooking />} />
+      <Route path="/reschedule" element={<RescheduleBooking />} />
     </Routes>
   );
 }

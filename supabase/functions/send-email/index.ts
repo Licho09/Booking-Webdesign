@@ -4,6 +4,7 @@ const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
 const FROM_EMAIL = Deno.env.get('FROM_EMAIL') || 'info@designcxlabs.com';
 const REPLY_TO_EMAIL = Deno.env.get('REPLY_TO_EMAIL') || 'info@designcxlabs.com';
 const OWNER_EMAIL = Deno.env.get('OWNER_EMAIL') || 'luischirinos1000@gmail.com';
+const SITE_URL = Deno.env.get('SITE_URL') || 'https://yoursite.com';
 
 interface EmailRequest {
   email: string;
@@ -11,6 +12,7 @@ interface EmailRequest {
   date: string;
   time: string;
   businessName?: string;
+  bookingId?: string;
 }
 
 serve(async (req) => {
@@ -42,8 +44,14 @@ serve(async (req) => {
     // No need to check auth - just process the request
 
     console.log('Parsing request body...');
-    const { email, name, date, time, businessName }: EmailRequest = await req.json();
-    console.log('Request data received:', { email, name, date, time, businessName });
+    const requestBody = await req.json();
+    console.log('📥 Raw request body:', JSON.stringify(requestBody, null, 2));
+    const { email, name, date, time, businessName, bookingId }: EmailRequest = requestBody;
+    console.log('Request data received:', { email, name, date, time, businessName, bookingId });
+    console.log('📋 Booking ID in email function:', bookingId);
+    console.log('📋 Booking ID type:', typeof bookingId);
+    console.log('📋 Booking ID truthy?', !!bookingId);
+    console.log('📋 SITE_URL:', SITE_URL);
 
     if (!email || !name || !date || !time) {
       return new Response(
@@ -85,6 +93,23 @@ serve(async (req) => {
     </div>
     
     <p>We'll send you a reminder the day before your appointment. If you need to reschedule or have any questions, just reply to this email.</p>
+    
+    ${bookingId ? `
+    <div style="margin: 30px 0; text-align: center;">
+      <p style="margin-bottom: 15px; color: #666; font-size: 14px;">Need to make changes?</p>
+      <div style="display: inline-flex; gap: 12px; flex-wrap: wrap; justify-content: center;">
+        <a href="${SITE_URL.replace(/\/$/, '')}/reschedule?id=${bookingId}" 
+           style="display: inline-block; padding: 12px 24px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; transition: transform 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+          🔄 Reschedule
+        </a>
+        <a href="${SITE_URL.replace(/\/$/, '')}/cancel?id=${bookingId}" 
+           style="display: inline-block; padding: 12px 24px; background: #ef4444; color: white; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; transition: transform 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+          ❌ Cancel
+        </a>
+      </div>
+      <p style="margin-top: 10px; color: #999; font-size: 12px;">Booking ID: ${bookingId}</p>
+    </div>
+    ` : '<p style="color: #999; font-size: 12px; text-align: center; margin: 20px 0;">⚠️ No booking ID provided</p>'}
     
     <p style="margin-top: 30px;">Looking forward to speaking with you!</p>
     
