@@ -1,7 +1,14 @@
-# Render redirects file
+# Netlify/Render redirects file
 # This ensures static files are served before React Router handles routes
+# All routes should redirect to index.html for React Router to handle
 
 /sitemap.xml  /sitemap.xml  200
+
+# React Router SPA fallback - redirect all routes to index.html
+/cancel       /index.html   200
+/reschedule   /index.html   200
+/thank-you    /index.html   200
+/*            /index.html   200
 
 
 
