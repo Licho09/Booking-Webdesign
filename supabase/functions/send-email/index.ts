@@ -98,11 +98,11 @@ serve(async (req) => {
     <div style="margin: 30px 0; text-align: center;">
       <p style="margin-bottom: 15px; color: #666; font-size: 14px;">Need to make changes?</p>
       <div style="display: inline-flex; gap: 12px; flex-wrap: wrap; justify-content: center;">
-        <a href="${SITE_URL.replace(/\/$/, '')}/reschedule?id=${bookingId}" 
+        <a href="${SITE_URL.replace(/\/$/, '')}/#/reschedule?id=${bookingId}" 
            style="display: inline-block; padding: 12px 24px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; transition: transform 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
           🔄 Reschedule
         </a>
-        <a href="${SITE_URL.replace(/\/$/, '')}/cancel?id=${bookingId}" 
+        <a href="${SITE_URL.replace(/\/$/, '')}/#/cancel?id=${bookingId}" 
            style="display: inline-block; padding: 12px 24px; background: #ef4444; color: white; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; transition: transform 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
           ❌ Cancel
         </a>
