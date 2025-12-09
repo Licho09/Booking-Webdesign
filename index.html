@@ -12,6 +12,21 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      // Redirect non-hash URLs to hash URLs for HashRouter compatibility
+      // This handles old email links and direct URL access
+      (function() {
+        const path = window.location.pathname;
+        const search = window.location.search;
+        const hash = window.location.hash;
+        
+        // If we're on a route that's not the root and there's no hash, redirect to hash version
+        if (path !== '/' && !hash) {
+          const newPath = path + search;
+          window.location.replace('#' + newPath);
+        }
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
