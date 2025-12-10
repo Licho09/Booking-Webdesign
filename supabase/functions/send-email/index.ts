@@ -4,7 +4,7 @@ const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
 const FROM_EMAIL = Deno.env.get('FROM_EMAIL') || 'info@designcxlabs.com';
 const REPLY_TO_EMAIL = Deno.env.get('REPLY_TO_EMAIL') || 'info@designcxlabs.com';
 const OWNER_EMAIL = Deno.env.get('OWNER_EMAIL') || 'luischirinos1000@gmail.com';
-const SITE_URL = Deno.env.get('SITE_URL') || 'https://yoursite.com';
+const SITE_URL = Deno.env.get('SITE_URL') || 'https://www.designcxlabs.com';
 
 interface EmailRequest {
   email: string;
