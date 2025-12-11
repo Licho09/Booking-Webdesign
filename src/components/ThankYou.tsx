@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { CheckCircle } from 'lucide-react';
 import { trackEvent } from '../lib/analytics';
 
+// Updated: Added spam folder instructions with images
+
 export function ThankYou() {
   const navigate = useNavigate();
 
