@@ -16,3 +16,4 @@ CREATE POLICY "Anonymous users can read bookings by ID"
   TO anon
   USING (true);
 
+

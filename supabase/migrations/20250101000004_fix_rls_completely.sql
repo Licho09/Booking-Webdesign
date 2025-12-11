@@ -34,3 +34,4 @@ CREATE POLICY "Anonymous users can delete their bookings"
   TO anon
   USING (true);
 
+

@@ -29,3 +29,4 @@ You could switch to HashRouter, but URLs would look like:
 - `https://www.designcxlabs.com/#/reschedule?id=...`
 - This is less clean and not SEO-friendly
 
+
