@@ -52,6 +52,13 @@ serve(async (req) => {
     console.log('📋 Booking ID type:', typeof bookingId);
     console.log('📋 Booking ID truthy?', !!bookingId);
     console.log('📋 SITE_URL:', SITE_URL);
+    
+    // Ensure SITE_URL doesn't have trailing slash and construct hash URLs
+    const baseUrl = SITE_URL.replace(/\/$/, '');
+    const rescheduleUrl = `${baseUrl}/#/reschedule?id=${bookingId}`;
+    const cancelUrl = `${baseUrl}/#/cancel?id=${bookingId}`;
+    console.log('📋 Reschedule URL:', rescheduleUrl);
+    console.log('📋 Cancel URL:', cancelUrl);
 
     if (!email || !name || !date || !time) {
       return new Response(
@@ -98,11 +105,11 @@ serve(async (req) => {
     <div style="margin: 30px 0; text-align: center;">
       <p style="margin-bottom: 15px; color: #666; font-size: 14px;">Need to make changes?</p>
       <div style="display: inline-flex; gap: 12px; flex-wrap: wrap; justify-content: center;">
-        <a href="${SITE_URL.replace(/\/$/, '')}/#/reschedule?id=${bookingId}" 
+        <a href="${rescheduleUrl}" 
            style="display: inline-block; padding: 12px 24px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; transition: transform 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
           🔄 Reschedule
         </a>
-        <a href="${SITE_URL.replace(/\/$/, '')}/#/cancel?id=${bookingId}" 
+        <a href="${cancelUrl}" 
            style="display: inline-block; padding: 12px 24px; background: #ef4444; color: white; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; transition: transform 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
           ❌ Cancel
         </a>
