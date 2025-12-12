@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { XCircle, Loader2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { Lead } from '../lib/supabase';
+import { sendCancellationNotification } from '../lib/sendCancellationNotification';
 
 export function CancelBooking() {
   const navigate = useNavigate();
@@ -89,6 +90,29 @@ export function CancelBooking() {
         setError('Failed to cancel booking. Please try again.');
         setCancelling(false);
         return;
+      }
+
+      // Send cancellation notifications to both client and owner
+      const bookingDate = booking.booking_date 
+        ? new Date(booking.booking_date + 'T00:00:00').toLocaleDateString('en-US', {
+            weekday: 'long',
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric'
+          })
+        : booking.booking_date || 'Unknown';
+
+      try {
+        await sendCancellationNotification(
+          booking.email,
+          booking.name,
+          bookingDate,
+          booking.booking_time || 'Unknown',
+          booking.business || undefined
+        );
+      } catch (emailError) {
+        console.error('Failed to send cancellation notifications:', emailError);
+        // Don't fail cancellation if email fails
       }
 
       setSuccess(true);

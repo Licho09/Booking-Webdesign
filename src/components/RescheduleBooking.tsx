@@ -4,6 +4,7 @@ import { Loader2, CheckCircle } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { Lead } from '../lib/supabase';
 import { sendEmailConfirmation } from '../lib/sendEmail';
+import { sendRescheduleNotification } from '../lib/sendRescheduleNotification';
 
 export function RescheduleBooking() {
   console.log('RescheduleBooking component rendering...');
@@ -280,25 +281,51 @@ export function RescheduleBooking() {
         return;
       }
 
-      // Send updated confirmation email
-      const dateString = selectedDate.toLocaleDateString('en-US', {
+      // Format dates for emails
+      const oldDateString = booking.booking_date
+        ? new Date(booking.booking_date + 'T00:00:00').toLocaleDateString('en-US', {
+            weekday: 'long',
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric'
+          })
+        : booking.booking_date || 'Unknown';
+
+      const newDateString = selectedDate.toLocaleDateString('en-US', {
         weekday: 'long',
         month: 'long',
         day: 'numeric',
         year: 'numeric'
       });
 
+      // Send reschedule notification to both client and owner
+      try {
+        await sendRescheduleNotification(
+          booking.email,
+          booking.name,
+          oldDateString,
+          booking.booking_time || 'Unknown',
+          newDateString,
+          selectedTime,
+          booking.business || undefined
+        );
+      } catch (emailError) {
+        console.error('Failed to send reschedule notifications:', emailError);
+        // Don't fail rescheduling if email fails
+      }
+
+      // Also send updated confirmation email (for consistency with original booking flow)
       try {
         await sendEmailConfirmation(
           booking.email,
           booking.name,
-          dateString,
+          newDateString,
           selectedTime,
           booking.business || undefined,
           bookingId
         );
       } catch (emailError) {
-        console.error('Failed to send email:', emailError);
+        console.error('Failed to send confirmation email:', emailError);
         // Don't fail rescheduling if email fails
       }
 
