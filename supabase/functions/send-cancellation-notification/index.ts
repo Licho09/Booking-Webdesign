@@ -14,8 +14,11 @@ interface CancellationRequest {
 }
 
 serve(async (req) => {
+  console.log('📧 Cancellation notification function called:', req.method);
+  
   // Handle CORS
   if (req.method === 'OPTIONS') {
+    console.log('✅ Handling CORS preflight request');
     return new Response(null, {
       headers: {
         'Access-Control-Allow-Origin': '*',
@@ -26,6 +29,7 @@ serve(async (req) => {
   }
 
   try {
+    console.log('📧 Processing cancellation notification request...');
     if (!RESEND_API_KEY) {
       console.warn('RESEND_API_KEY is missing - cancellation notification skipped');
       return new Response(
@@ -44,9 +48,13 @@ serve(async (req) => {
       );
     }
 
-    const { email, name, date, time, businessName }: CancellationRequest = await req.json();
+    const requestBody = await req.json();
+    console.log('📧 Request body received:', JSON.stringify(requestBody, null, 2));
+    
+    const { email, name, date, time, businessName }: CancellationRequest = requestBody;
 
     if (!email || !name || !date || !time) {
+      console.error('❌ Missing required fields');
       return new Response(
         JSON.stringify({ error: 'Missing required fields: email, name, date, time' }),
         {
@@ -174,6 +182,7 @@ This is an automated notification from your booking system.
 
     const resendUrl = 'https://api.resend.com/emails';
     
+    console.log('📤 Sending email to client:', email);
     // Send email to client
     const clientResponse = await fetch(resendUrl, {
       method: 'POST',
@@ -191,6 +200,7 @@ This is an automated notification from your booking system.
       }),
     });
 
+    console.log('📤 Sending email to owner:', OWNER_EMAIL);
     // Send email to owner
     const ownerResponse = await fetch(resendUrl, {
       method: 'POST',
@@ -208,12 +218,34 @@ This is an automated notification from your booking system.
       }),
     });
 
+    const clientResponseData = await clientResponse.json().catch(() => ({}));
+    const ownerResponseData = await ownerResponse.json().catch(() => ({}));
+    
+    console.log('📥 Client email response:', clientResponse.status, clientResponseData);
+    console.log('📥 Owner email response:', ownerResponse.status, ownerResponseData);
+    
     if (!clientResponse.ok || !ownerResponse.ok) {
-      const clientError = await clientResponse.json().catch(() => ({}));
-      const ownerError = await ownerResponse.json().catch(() => ({}));
-      console.error('Error sending cancellation emails:', { clientError, ownerError });
+      console.error('❌ Error sending cancellation emails:', { 
+        clientError: clientResponseData, 
+        ownerError: ownerResponseData 
+      });
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: 'Failed to send one or more emails',
+          details: { clientError: clientResponseData, ownerError: ownerResponseData }
+        }),
+        {
+          status: 500,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+          },
+        }
+      );
     }
 
+    console.log('✅ Cancellation notifications sent successfully!');
     return new Response(
       JSON.stringify({ 
         success: true, 

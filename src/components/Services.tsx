@@ -27,6 +27,11 @@ export function Services() {
       title: 'Ongoing Support',
       description: 'I stay available for updates, improvements, and strategy so your website keeps performing.',
     },
+    {
+      emoji: '📊',
+      title: 'Analytics & Performance Analysis',
+      description: 'Understand and improve your website's health and functionality so you can continue to rank well in search results.',
+    },
   ];
 
   return (

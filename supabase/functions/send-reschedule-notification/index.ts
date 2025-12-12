@@ -76,13 +76,13 @@ serve(async (req) => {
 </head>
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
   <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
-    <h1 style="color: white; margin: 0; font-size: 28px;">Booking Rescheduled! 🔄</h1>
+    <h1 style="color: white; margin: 0; font-size: 28px;">Rescheduled Booking Confirmed! 🔄</h1>
   </div>
   
   <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; border: 1px solid #e0e0e0; border-top: none;">
     <p style="font-size: 18px; margin-top: 0;">Hi ${name}!</p>
     
-    <p>Your booking has been successfully rescheduled.</p>
+    <p>Your booking has been successfully rescheduled and confirmed.</p>
     
     <div style="background: #fff3cd; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #ffc107;">
       <h2 style="margin-top: 0; color: #856404; font-size: 20px;">📅 Previous Appointment</h2>
@@ -112,7 +112,7 @@ serve(async (req) => {
     const clientEmailText = `
 Hi ${name}!
 
-Your booking has been successfully rescheduled.
+Your booking has been successfully rescheduled and confirmed.
 
 📅 Previous Appointment
 Date: ${oldDate}
@@ -207,7 +207,7 @@ This is an automated notification from your booking system.
         from: fromEmail,
         to: email,
         reply_to: REPLY_TO_EMAIL,
-        subject: `Booking Rescheduled: ${newDate} at ${newTime}`,
+        subject: `Rescheduled Booking Confirmed: ${newDate} at ${newTime}`,
         html: clientEmailHtml,
         text: clientEmailText,
       }),

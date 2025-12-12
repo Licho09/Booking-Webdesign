@@ -102,6 +102,15 @@ export function CancelBooking() {
           })
         : booking.booking_date || 'Unknown';
 
+      console.log('📧 About to send cancellation notification...');
+      console.log('📧 Booking data:', { 
+        email: booking.email, 
+        name: booking.name, 
+        date: bookingDate, 
+        time: booking.booking_time,
+        business: booking.business 
+      });
+
       try {
         const emailResult = await sendCancellationNotification(
           booking.email,
@@ -110,6 +119,7 @@ export function CancelBooking() {
           booking.booking_time || 'Unknown',
           booking.business || undefined
         );
+        console.log('📧 Email result:', emailResult);
         if (emailResult.success) {
           console.log('✅ Cancellation notifications sent successfully');
         } else {

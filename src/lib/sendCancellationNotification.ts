@@ -37,13 +37,18 @@ export async function sendCancellationNotification(
     };
     
     console.log('📤 Calling cancellation notification function...');
+    console.log('📤 Function name: send-cancellation-notification');
+    console.log('📤 Request body:', JSON.stringify(requestBody, null, 2));
     
     const { data, error } = await supabase.functions.invoke('send-cancellation-notification', {
       body: requestBody,
     });
 
+    console.log('📥 Function response:', { data, error });
+
     if (error) {
       console.error('❌ Cancellation notification failed:', error);
+      console.error('❌ Error details:', JSON.stringify(error, null, 2));
       // Try direct fetch as fallback
       try {
         const response = await fetch(functionUrl, {
