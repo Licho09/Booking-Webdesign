@@ -103,15 +103,20 @@ export function CancelBooking() {
         : booking.booking_date || 'Unknown';
 
       try {
-        await sendCancellationNotification(
+        const emailResult = await sendCancellationNotification(
           booking.email,
           booking.name,
           bookingDate,
           booking.booking_time || 'Unknown',
           booking.business || undefined
         );
+        if (emailResult.success) {
+          console.log('✅ Cancellation notifications sent successfully');
+        } else {
+          console.warn('⚠️ Cancellation notifications failed:', emailResult.error);
+        }
       } catch (emailError) {
-        console.error('Failed to send cancellation notifications:', emailError);
+        console.error('❌ Failed to send cancellation notifications:', emailError);
         // Don't fail cancellation if email fails
       }
 
