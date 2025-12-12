@@ -200,6 +200,7 @@ export function LeadForm() {
     });
 
     let bookingId: string | null = null;
+    let bookingSaved = false;
 
     // Save to database first to get booking ID
     try {
@@ -231,16 +232,28 @@ export function LeadForm() {
           }
           console.warn('Database save failed, trying localStorage fallback:', supabaseError);
           // Fallback to localStorage if Supabase fails
-          const saved = JSON.parse(localStorage.getItem('leads') || '[]');
-          const tempId = `local-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-          lead.id = tempId;
-          saved.push(lead);
-          localStorage.setItem('leads', JSON.stringify(saved));
-          bookingId = tempId;
-          console.log('Lead saved to localStorage as fallback:', lead);
-          console.log('📋 Booking ID (localStorage):', bookingId);
+          try {
+            const saved = JSON.parse(localStorage.getItem('leads') || '[]');
+            const tempId = `local-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+            lead.id = tempId;
+            saved.push(lead);
+            localStorage.setItem('leads', JSON.stringify(saved));
+            bookingId = tempId;
+            bookingSaved = true;
+            console.log('Lead saved to localStorage as fallback:', lead);
+            console.log('📋 Booking ID (localStorage):', bookingId);
+          } catch (localStorageError) {
+            console.error('Failed to save to localStorage:', localStorageError);
+            setError('Failed to save your booking. Please try again.');
+            trackFormSubmitError('database_error');
+            setIsSubmitting(false);
+            return;
+          }
         } else {
-          // Successfully saved - query for the booking ID using email + date + time
+          // Successfully saved to Supabase
+          bookingSaved = true;
+          
+          // Query for the booking ID using email + date + time
           console.log('📋 Querying for booking ID with:', { email: lead.email, date: dateStr, time: selectedTime });
           const { data: bookingData, error: queryError } = await supabase
             .from('leads')
@@ -267,22 +280,41 @@ export function LeadForm() {
         }
       } else {
         // Fallback to localStorage for frontend-only mode
-        const saved = JSON.parse(localStorage.getItem('leads') || '[]');
-        const tempId = `local-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-        lead.id = tempId;
-        saved.push(lead);
-        localStorage.setItem('leads', JSON.stringify(saved));
-        bookingId = tempId;
-        console.log('Lead saved to localStorage:', lead);
-        // Add to booked slots
-        const booked = new Set(bookedSlots);
-        booked.add(selectedTime);
-        setBookedSlots(booked);
+        try {
+          const saved = JSON.parse(localStorage.getItem('leads') || '[]');
+          const tempId = `local-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+          lead.id = tempId;
+          saved.push(lead);
+          localStorage.setItem('leads', JSON.stringify(saved));
+          bookingId = tempId;
+          bookingSaved = true;
+          console.log('Lead saved to localStorage:', lead);
+          // Add to booked slots
+          const booked = new Set(bookedSlots);
+          booked.add(selectedTime);
+          setBookedSlots(booked);
+        } catch (localStorageError) {
+          console.error('Failed to save to localStorage:', localStorageError);
+          setError('Failed to save your booking. Please try again.');
+          trackFormSubmitError('database_error');
+          setIsSubmitting(false);
+          return;
+        }
       }
     } catch (err) {
-      console.warn('Error saving to database:', err);
+      console.error('Error saving to database:', err);
+      setError('Failed to save your booking. Please try again.');
       trackFormSubmitError('database_error');
-      // Continue anyway - we'll send email without booking ID
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Only proceed if booking was successfully saved
+    if (!bookingSaved) {
+      setError('Failed to save your booking. Please try again.');
+      trackFormSubmitError('database_error');
+      setIsSubmitting(false);
+      return;
     }
 
     // Send email confirmation with booking ID (if available)
@@ -328,7 +360,13 @@ export function LeadForm() {
       hasBusinessName: !!formData.businessName,
     });
 
-    // Navigate to thank you page
+    // Track Lead event for Meta Pixel - ONLY after successful booking save
+    // This ensures we only track real, successful conversions
+    if (typeof window !== 'undefined' && (window as any).fbq) {
+      (window as any).fbq('track', 'Lead');
+    }
+
+    // Navigate to thank you page - ONLY after successful booking save
     setIsSubmitting(false);
     navigate('/thank-you');
   };

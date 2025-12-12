@@ -24,6 +24,13 @@ function HomePage() {
     }
   }, [isUsingScrollbar, scrollbarWidth]);
 
+  // Track ViewContent event for Meta Pixel on landing page
+  useEffect(() => {
+    if (typeof window !== 'undefined' && (window as any).fbq) {
+      (window as any).fbq('track', 'ViewContent');
+    }
+  }, []);
+
   // Setup smooth scrolling with Lenis
   useEffect(() => {
     const lenis = new Lenis({

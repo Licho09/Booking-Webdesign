@@ -17,6 +17,13 @@ export function ThankYou() {
     trackEvent('conversion', {
       conversion_type: 'booking_completed',
     });
+
+    // Track Schedule event for Meta Pixel
+    // This only fires if user reaches thank you page, which means booking was successfully saved
+    // (Navigation only happens after successful async booking save in LeadForm)
+    if (typeof window !== 'undefined' && (window as any).fbq) {
+      (window as any).fbq('track', 'Schedule');
+    }
   }, []);
 
   return (
