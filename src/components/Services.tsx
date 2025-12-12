@@ -30,7 +30,7 @@ export function Services() {
     {
       emoji: '📊',
       title: 'Analytics & Performance Analysis',
-      description: 'Understand and improve your website's health and functionality so you can continue to rank well in search results.',
+      description: "Understand and improve your website's health and functionality so you can continue to rank well in search results.",
     },
   ];
 
