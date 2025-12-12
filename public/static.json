@@ -1,6 +1,9 @@
 {
   "routes": {
     "/sitemap.xml": "/sitemap.xml",
+    "/cancel": "/index.html",
+    "/reschedule": "/index.html",
+    "/thank-you": "/index.html",
     "/*": "/index.html"
   }
 }
