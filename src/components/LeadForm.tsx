@@ -462,8 +462,8 @@ export function LeadForm() {
   };
 
   return (
-    <section id="offer" className="max-w-5xl mx-auto px-8 py-8">
-      <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-white font-semibold mb-6 text-center fade-in-slide-up-delay-3 px-2">
+    <section id="offer" className="max-w-5xl mx-auto px-1 sm:px-8 py-8">
+      <p className="text-base sm:text-xl md:text-2xl lg:text-3xl text-white font-semibold mb-6 text-center fade-in-slide-up-delay-3 whitespace-nowrap px-1">
         👇 Schedule A Call With Us To Learn How We Do it 👇
       </p>
       <div className="bg-white rounded-2xl shadow-2xl overflow-hidden slide-up">
