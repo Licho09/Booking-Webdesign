@@ -1,8 +1,8 @@
 export function Hero() {
   return (
-    <section className="max-w-6xl mx-auto px-8 py-12 text-center">
+    <section className="max-w-6xl mx-auto px-2 sm:px-8 py-12 text-center">
       <div className="space-y-6">
-        <h1 className="text-4xl lg:text-5xl xl:text-6xl font-bold text-white leading-tight max-w-5xl mx-auto fade-in-slide-up">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-white leading-tight max-w-full sm:max-w-5xl mx-auto fade-in-slide-up whitespace-nowrap px-1">
           Local Contractors...
         </h1>
       </div>
@@ -11,7 +11,10 @@ export function Hero() {
       </div>
       <div className="space-y-6">
         <h1 className="text-3xl lg:text-4xl xl:text-5xl font-bold text-white leading-tight max-w-5xl mx-auto fade-in-slide-up-delay-1">
-          Implement <span className="bg-white/20 px-3 py-1 rounded-lg">Websites + Ads + AI</span> That Get Local Contractors <span className="text-red-500 font-black text-4xl lg:text-5xl xl:text-6xl ml-2">More Jobs</span>
+          <span className="block lg:inline">Implement</span>{' '}
+          <span className="block lg:inline"><span className="bg-white/20 px-3 py-1 rounded-lg">Websites + Ads + AI</span></span>{' '}
+          <span className="block lg:inline">That Get Local Contractors</span>{' '}
+          <span className="block lg:inline"><span className="text-red-500 font-black text-4xl lg:text-5xl xl:text-6xl ml-2">More Jobs</span></span>
         </h1>
       </div>
     </section>
