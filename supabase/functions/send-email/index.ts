@@ -52,7 +52,7 @@ serve(async (req) => {
     console.log('📋 Booking ID type:', typeof bookingId);
     console.log('📋 Booking ID truthy?', !!bookingId);
     console.log('📋 SITE_URL:', SITE_URL);
-    
+
     // Ensure SITE_URL doesn't have trailing slash and construct hash URLs
     const baseUrl = SITE_URL.replace(/\/$/, '');
     const rescheduleUrl = `${baseUrl}/#/reschedule?id=${bookingId}`;

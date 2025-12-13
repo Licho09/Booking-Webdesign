@@ -1,7 +1,6 @@
 import { useState, FormEvent, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Clock, Calendar } from 'lucide-react';
-import GradientText from './GradientText';
 import { supabase } from '../lib/supabase';
 import { sendEmailConfirmation } from '../lib/sendEmail';
 import { sendOwnerNotification } from '../lib/sendOwnerNotification';
@@ -464,14 +463,9 @@ export function LeadForm() {
 
   return (
     <section id="offer" className="max-w-5xl mx-auto px-8 py-8">
-      <GradientText
-        colors={["#40ffaa", "#4079ff", "#40ffaa", "#4079ff", "#40ffaa"]}
-        animationSpeed={3}
-        showBorder={false}
-        className="mb-6 text-center fade-in-slide-up-delay-3"
-      >
-        <span className="text-5xl lg:text-6xl xl:text-7xl">BOOK NOW!</span>
-      </GradientText>
+      <p className="text-2xl lg:text-3xl text-white font-semibold mb-6 text-center fade-in-slide-up-delay-3 whitespace-nowrap">
+        👇 Schedule A Call With Us To Learn How We Do it 👇
+      </p>
       <div className="bg-white rounded-2xl shadow-2xl overflow-hidden slide-up">
         <div className="grid lg:grid-cols-2 gap-0">
           {/* Left Panel - Event Details (Form) - Hidden on mobile until Continue is clicked */}
@@ -500,7 +494,7 @@ export function LeadForm() {
             <div className="space-y-4 mb-6">
               <div className="flex items-center gap-3 text-gray-700">
                 <Clock className="w-5 h-5 text-gray-400" />
-                <span className="font-medium">15 Mins</span>
+                <span className="font-medium">30 Mins</span>
               </div>
               <div className="flex items-center gap-3 text-gray-700">
                 <Calendar className="w-5 h-5 text-gray-400" />
