@@ -2,7 +2,7 @@ export function Hero() {
   return (
     <section className="max-w-6xl mx-auto px-2 sm:px-8 py-12 text-center">
       <div className="space-y-6">
-        <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-white leading-tight max-w-full sm:max-w-5xl mx-auto fade-in-slide-up whitespace-nowrap px-1">
+        <h1 className="text-3xl sm:text-4xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-white leading-tight max-w-full sm:max-w-5xl mx-auto fade-in-slide-up whitespace-nowrap px-1">
           Local Contractors...
         </h1>
       </div>
