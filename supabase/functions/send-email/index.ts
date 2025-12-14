@@ -5,6 +5,7 @@ const FROM_EMAIL = Deno.env.get('FROM_EMAIL') || 'info@designcxlabs.com';
 const REPLY_TO_EMAIL = Deno.env.get('REPLY_TO_EMAIL') || 'info@designcxlabs.com';
 const OWNER_EMAIL = Deno.env.get('OWNER_EMAIL') || 'luischirinos1000@gmail.com';
 const SITE_URL = Deno.env.get('SITE_URL') || 'https://www.designcxlabs.com';
+const MEETING_LINK = Deno.env.get('MEETING_LINK') || ''; // Optional: Zoom, Google Meet, or phone call link
 
 interface EmailRequest {
   email: string;
@@ -44,7 +45,37 @@ serve(async (req) => {
     // No need to check auth - just process the request
 
     console.log('Parsing request body...');
-    const requestBody = await req.json();
+    let requestBody: EmailRequest;
+    try {
+      const bodyText = await req.text();
+      if (bodyText && bodyText.trim()) {
+        requestBody = JSON.parse(bodyText);
+      } else {
+        return new Response(
+          JSON.stringify({ error: 'Missing request body. This function requires email, name, date, and time.' }),
+          {
+            status: 400,
+            headers: {
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*',
+            },
+          }
+        );
+      }
+    } catch (parseError) {
+      console.error('Error parsing request body:', parseError);
+      return new Response(
+        JSON.stringify({ error: 'Invalid JSON in request body' }),
+        {
+          status: 400,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+          },
+        }
+      );
+    }
+    
     console.log('📥 Raw request body:', JSON.stringify(requestBody, null, 2));
     const { email, name, date, time, businessName, bookingId }: EmailRequest = requestBody;
     console.log('Request data received:', { email, name, date, time, businessName, bookingId });
@@ -73,33 +104,38 @@ serve(async (req) => {
       );
     }
 
-    // Create email HTML content
+    // Format date for display (e.g., "Monday, January 15, 2025")
+    const formattedDate = date; // date is already formatted from the request
+    
+    // Create email HTML content with new format
     const emailHtml = `
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Booking Confirmation</title>
+  <title>Your call is booked</title>
 </head>
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
   <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
-    <h1 style="color: white; margin: 0; font-size: 28px;">Booking Confirmed! 🎉</h1>
+    <h1 style="color: white; margin: 0; font-size: 28px;">Your call is booked</h1>
   </div>
   
   <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; border: 1px solid #e0e0e0; border-top: none;">
-    <p style="font-size: 18px; margin-top: 0;">Hi ${name}!</p>
+    <p style="font-size: 18px; margin-top: 0; font-weight: 500;">You're all set.</p>
     
-    <p>Your website consultation has been confirmed. We're excited to help bring your vision to life!</p>
+    <p style="font-size: 16px; margin: 20px 0;">We're scheduled to talk on <strong>${date}</strong> at <strong>${time}</strong>.</p>
     
-    <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #667eea;">
-      <h2 style="margin-top: 0; color: #667eea; font-size: 20px;">📅 Appointment Details</h2>
-      <p style="margin: 10px 0;"><strong>Date:</strong> ${date}</p>
-      <p style="margin: 10px 0;"><strong>Time:</strong> ${time}</p>
-      ${businessName ? `<p style="margin: 10px 0;"><strong>Business:</strong> ${businessName}</p>` : ''}
+    <p style="font-size: 16px; margin: 20px 0;">On the call, we'll go over how we help local contractors get more leads using high-converting websites and automation.</p>
+    
+    ${MEETING_LINK ? `
+    <div style="margin: 30px 0; text-align: center;">
+      <a href="${MEETING_LINK}" 
+         style="display: inline-block; padding: 14px 28px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        Join link: ${MEETING_LINK.includes('zoom') ? 'Zoom Meeting' : MEETING_LINK.includes('meet.google') ? 'Google Meet' : 'Join Call'}
+      </a>
     </div>
-    
-    <p>We'll send you a reminder the day before your appointment. If you need to reschedule or have any questions, just reply to this email.</p>
+    ` : ''}
     
     ${bookingId ? `
     <div style="margin: 30px 0; text-align: center;">
@@ -118,15 +154,10 @@ serve(async (req) => {
     </div>
     ` : '<p style="color: #999; font-size: 12px; text-align: center; margin: 20px 0;">⚠️ No booking ID provided</p>'}
     
-    <p style="margin-top: 30px;">Looking forward to speaking with you!</p>
-    
     <p style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0; color: #666; font-size: 14px;">
       Best regards,<br>
       <strong>DesignCXLabs</strong><br>
       <a href="mailto:${REPLY_TO_EMAIL}" style="color: #667eea; text-decoration: none;">${REPLY_TO_EMAIL}</a>
-    </p>
-    <p style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #e0e0e0; color: #999; font-size: 12px; text-align: center;">
-      This is an automated confirmation email. If you need to reschedule, please reply to this email.
     </p>
   </div>
 </body>
@@ -135,21 +166,23 @@ serve(async (req) => {
 
     // Plain text version
     const emailText = `
-Hi ${name}!
+You're all set.
 
-Your website consultation has been confirmed. We're excited to help bring your vision to life!
+We're scheduled to talk on ${date} at ${time}.
 
-📅 Appointment Details
-Date: ${date}
-Time: ${time}
-${businessName ? `Business: ${businessName}` : ''}
+On the call, we'll go over how we help local contractors get more leads using high-converting websites and automation.
 
-We'll send you a reminder the day before your appointment. If you need to reschedule or have any questions, just reply to this email.
+${MEETING_LINK ? `Join link: ${MEETING_LINK}` : ''}
 
-Looking forward to speaking with you!
+${bookingId ? `
+Need to make changes?
+Reschedule: ${rescheduleUrl}
+Cancel: ${cancelUrl}
+Booking ID: ${bookingId}
+` : ''}
 
 Best regards,
-Your Web Design Team
+DesignCXLabs
     `;
 
     // Send email via Resend
@@ -166,7 +199,7 @@ Your Web Design Team
       from: fromEmail,
       to: email,
       reply_to: REPLY_TO_EMAIL,
-      subject: `Booking Confirmed: ${date} at ${time}`,
+      subject: `Your call is booked`,
       html: emailHtml,
       text: emailText,
       // Add headers to improve deliverability and prevent spam

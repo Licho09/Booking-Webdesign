@@ -232,15 +232,15 @@ export function LeadForm() {
           console.warn('Database save failed, trying localStorage fallback:', supabaseError);
           // Fallback to localStorage if Supabase fails
           try {
-            const saved = JSON.parse(localStorage.getItem('leads') || '[]');
-            const tempId = `local-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-            lead.id = tempId;
-            saved.push(lead);
-            localStorage.setItem('leads', JSON.stringify(saved));
-            bookingId = tempId;
+          const saved = JSON.parse(localStorage.getItem('leads') || '[]');
+          const tempId = `local-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+          lead.id = tempId;
+          saved.push(lead);
+          localStorage.setItem('leads', JSON.stringify(saved));
+          bookingId = tempId;
             bookingSaved = true;
-            console.log('Lead saved to localStorage as fallback:', lead);
-            console.log('📋 Booking ID (localStorage):', bookingId);
+          console.log('Lead saved to localStorage as fallback:', lead);
+          console.log('📋 Booking ID (localStorage):', bookingId);
           } catch (localStorageError) {
             console.error('Failed to save to localStorage:', localStorageError);
             setError('Failed to save your booking. Please try again.');
@@ -280,18 +280,18 @@ export function LeadForm() {
       } else {
         // Fallback to localStorage for frontend-only mode
         try {
-          const saved = JSON.parse(localStorage.getItem('leads') || '[]');
-          const tempId = `local-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-          lead.id = tempId;
-          saved.push(lead);
-          localStorage.setItem('leads', JSON.stringify(saved));
-          bookingId = tempId;
+        const saved = JSON.parse(localStorage.getItem('leads') || '[]');
+        const tempId = `local-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        lead.id = tempId;
+        saved.push(lead);
+        localStorage.setItem('leads', JSON.stringify(saved));
+        bookingId = tempId;
           bookingSaved = true;
-          console.log('Lead saved to localStorage:', lead);
-          // Add to booked slots
-          const booked = new Set(bookedSlots);
-          booked.add(selectedTime);
-          setBookedSlots(booked);
+        console.log('Lead saved to localStorage:', lead);
+        // Add to booked slots
+        const booked = new Set(bookedSlots);
+        booked.add(selectedTime);
+        setBookedSlots(booked);
         } catch (localStorageError) {
           console.error('Failed to save to localStorage:', localStorageError);
           setError('Failed to save your booking. Please try again.');
@@ -464,7 +464,10 @@ export function LeadForm() {
   return (
     <section id="offer" className="max-w-5xl mx-auto px-8 py-8">
       <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-white font-semibold mb-6 text-center fade-in-slide-up-delay-3 px-2">
-        👇 Schedule A Call With Us To Learn How We Do it 👇
+        👇 Book a Free Strategy Call 👇
+      </p>
+      <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-white font-semibold mb-3 text-center fade-in-slide-up-delay-3 px-2 underline">
+        Designed for contractors doing $10k+/month
       </p>
       <div className="bg-white rounded-2xl shadow-2xl overflow-hidden slide-up">
         <div className="grid lg:grid-cols-2 gap-0">
@@ -483,18 +486,18 @@ export function LeadForm() {
               </button>
             )}
             <div className="text-2xl lg:text-3xl font-bold text-red-500 mb-2">Get Started!</div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">Book Your Free Website Consultation</h3>
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">Free Contractor Growth Call</h3>
             
             <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-6">
               <p className="text-sm text-amber-800 font-medium">
-                I only take a few new clients each month — get your spot now.
+                25 minutes · No obligation · See if this is a fit
               </p>
             </div>
             
             <div className="space-y-4 mb-6">
               <div className="flex items-center gap-3 text-gray-700">
                 <Clock className="w-5 h-5 text-gray-400" />
-                <span className="font-medium">30 Mins</span>
+                <span className="font-medium">25 Mins</span>
               </div>
               <div className="flex items-center gap-3 text-gray-700">
                 <Calendar className="w-5 h-5 text-gray-400" />
