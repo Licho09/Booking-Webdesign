@@ -46,12 +46,14 @@ Look for **"HTTP Method"** or **"Advanced Settings"**:
 Click "Add Header" or find the headers section, add these 3:
 
 ```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFndHJtbGt0Y3h3a2tzY2xoa25uIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MzEzNzc5NSwiZXhwIjoyMDc4NzEzNzk1fQ.XjwfzDwOz_GAOKCJ8luROvXpimcIhxwbKBxGciEIReU
+Authorization: Bearer YOUR_SERVICE_ROLE_KEY_HERE
 ```
 
 ```
-apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFndHJtbGt0Y3h3a2tzY2xoa25uIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MzEzNzc5NSwiZXhwIjoyMDc4NzEzNzk1fQ.XjwfzDwOz_GAOKCJ8luROvXpimcIhxwbKBxGciEIReU
+apikey: YOUR_SERVICE_ROLE_KEY_HERE
 ```
+
+**⚠️ IMPORTANT**: Replace `YOUR_SERVICE_ROLE_KEY_HERE` with your actual Supabase Service Role Key. You can find it in your Supabase Dashboard under Settings → API → Service Role Key.
 
 ```
 Content-Type: application/json
