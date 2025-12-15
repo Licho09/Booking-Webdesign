@@ -3,7 +3,6 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Loader2, CheckCircle } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { Lead } from '../lib/supabase';
-import { sendEmailConfirmation } from '../lib/sendEmail';
 import { sendRescheduleNotification } from '../lib/sendRescheduleNotification';
 
 // Helper function to validate UUID format
@@ -336,21 +335,6 @@ export function RescheduleBooking() {
         );
       } catch (emailError) {
         console.error('Failed to send reschedule notifications:', emailError);
-        // Don't fail rescheduling if email fails
-      }
-
-      // Also send updated confirmation email (for consistency with original booking flow)
-      try {
-        await sendEmailConfirmation(
-          booking.email,
-          booking.name,
-          newDateString,
-          selectedTime,
-          booking.business || undefined,
-          bookingId
-        );
-      } catch (emailError) {
-        console.error('Failed to send confirmation email:', emailError);
         // Don't fail rescheduling if email fails
       }
 
