@@ -75,3 +75,4 @@ Since cron-job.org free tier might not support POST properly, switch to EasyCron
 Go to Supabase Dashboard → Edge Functions and check if `check-and-send-reminders` exists. If not, you need to deploy it first using the Dashboard method.
 
 
+

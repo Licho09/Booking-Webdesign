@@ -61,3 +61,4 @@ This method works but is more manual.
 Once Supabase CLI is installed, continue with the deployment steps in `DEPLOY_FUNCTIONS.md`.
 
 
+

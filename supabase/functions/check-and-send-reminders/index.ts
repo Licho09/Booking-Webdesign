@@ -85,9 +85,10 @@ serve(async (req) => {
     
     // Query all upcoming bookings (today and future dates)
     // We'll check bookings from today up to 7 days in the future
+    // Include reminder tracking fields to prevent duplicates
     const { data: bookings, error } = await supabase
       .from('leads')
-      .select('id, email, name, business, booking_date, booking_time, created_at')
+      .select('id, email, name, business, booking_date, booking_time, created_at, reminder_1day_sent_at, reminder_starting_soon_sent_at')
       .not('booking_date', 'is', null)
       .not('booking_time', 'is', null)
       .gte('booking_date', today)
@@ -144,7 +145,8 @@ serve(async (req) => {
 
       try {
         // Check if we need to send 1-day reminder (23-25 hours before)
-        if (hoursUntil >= 23 && hoursUntil <= 25) {
+        // Only send if we haven't already sent one
+        if (hoursUntil >= 23 && hoursUntil <= 25 && !booking.reminder_1day_sent_at) {
           console.log(`📧 Sending 1-day reminder for booking ${booking.id} (${hoursUntil.toFixed(1)} hours until)`);
           
           // Call the 1-day reminder function
@@ -167,6 +169,16 @@ serve(async (req) => {
           });
 
           if (reminderResponse.ok) {
+            // Mark reminder as sent in database
+            const { error: updateError } = await supabase
+              .from('leads')
+              .update({ reminder_1day_sent_at: new Date().toISOString() })
+              .eq('id', booking.id);
+            
+            if (updateError) {
+              console.error(`⚠️ Failed to update reminder_1day_sent_at for booking ${booking.id}:`, updateError);
+            }
+            
             results.reminders1Day.push(booking.id);
             console.log(`✅ 1-day reminder sent for booking ${booking.id}`);
           } else {
@@ -174,10 +186,13 @@ serve(async (req) => {
             results.errors.push(`Failed to send 1-day reminder for ${booking.id}: ${JSON.stringify(errorData)}`);
             console.error(`❌ Failed to send 1-day reminder for ${booking.id}:`, errorData);
           }
+        } else if (hoursUntil >= 23 && hoursUntil <= 25 && booking.reminder_1day_sent_at) {
+          console.log(`⏭️ Skipping 1-day reminder for booking ${booking.id} - already sent at ${booking.reminder_1day_sent_at}`);
         }
 
         // Check if we need to send starting soon reminder (5-15 minutes before, or 0.08-0.25 hours)
-        if (hoursUntil >= 0.08 && hoursUntil <= 0.25) {
+        // Only send if we haven't already sent one
+        if (hoursUntil >= 0.08 && hoursUntil <= 0.25 && !booking.reminder_starting_soon_sent_at) {
           console.log(`📧 Sending starting soon reminder for booking ${booking.id} (${hoursUntil.toFixed(2)} hours = ${(hoursUntil * 60).toFixed(0)} minutes until)`);
           
           // Call the starting soon reminder function
@@ -199,6 +214,16 @@ serve(async (req) => {
           });
 
           if (startingSoonResponse.ok) {
+            // Mark reminder as sent in database
+            const { error: updateError } = await supabase
+              .from('leads')
+              .update({ reminder_starting_soon_sent_at: new Date().toISOString() })
+              .eq('id', booking.id);
+            
+            if (updateError) {
+              console.error(`⚠️ Failed to update reminder_starting_soon_sent_at for booking ${booking.id}:`, updateError);
+            }
+            
             results.remindersStartingSoon.push(booking.id);
             console.log(`✅ Starting soon reminder sent for booking ${booking.id}`);
           } else {
@@ -206,6 +231,8 @@ serve(async (req) => {
             results.errors.push(`Failed to send starting soon reminder for ${booking.id}: ${JSON.stringify(errorData)}`);
             console.error(`❌ Failed to send starting soon reminder for ${booking.id}:`, errorData);
           }
+        } else if (hoursUntil >= 0.08 && hoursUntil <= 0.25 && booking.reminder_starting_soon_sent_at) {
+          console.log(`⏭️ Skipping starting soon reminder for booking ${booking.id} - already sent at ${booking.reminder_starting_soon_sent_at}`);
         }
       } catch (error) {
         const errorMsg = error instanceof Error ? error.message : String(error);

@@ -105,3 +105,4 @@ Use a service like:
 **Use UptimeRobot** - it's the easiest free option that definitely works with Supabase domains.
 
 
+

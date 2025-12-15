@@ -80,3 +80,4 @@ Once you deploy all functions, they'll all follow the same pattern:
 But for the cron job, you only need the **check-and-send-reminders** URL!
 
 
+

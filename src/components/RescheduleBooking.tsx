@@ -6,14 +6,29 @@ import { Lead } from '../lib/supabase';
 import { sendEmailConfirmation } from '../lib/sendEmail';
 import { sendRescheduleNotification } from '../lib/sendRescheduleNotification';
 
+// Helper function to validate UUID format
+function isValidUUID(uuid: string | null): boolean {
+  if (!uuid) return false;
+  // UUID v4 format: xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(uuid);
+}
+
 export function RescheduleBooking() {
   console.log('RescheduleBooking component rendering...');
   
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const bookingId = searchParams.get('id');
+  const rawBookingId = searchParams.get('id');
   
-  console.log('RescheduleBooking: bookingId from URL:', bookingId);
+  console.log('RescheduleBooking: bookingId from URL:', rawBookingId);
+  
+  // Validate booking ID format
+  if (rawBookingId && !isValidUUID(rawBookingId)) {
+    console.error('Invalid booking ID format:', rawBookingId);
+  }
+  
+  const bookingId = rawBookingId && isValidUUID(rawBookingId) ? rawBookingId : null;
   
   const [booking, setBooking] = useState<Lead | null>(null);
   const [loading, setLoading] = useState(true);
@@ -46,9 +61,17 @@ export function RescheduleBooking() {
   useEffect(() => {
     console.log('RescheduleBooking: Fetching booking with ID:', bookingId);
     
-    if (!bookingId) {
+    if (!rawBookingId) {
       console.error('RescheduleBooking: No booking ID provided');
       setError('No booking ID provided');
+      setLoading(false);
+      return;
+    }
+    
+    if (!bookingId) {
+      // Invalid UUID format - likely a localStorage booking
+      console.error('RescheduleBooking: Invalid booking ID format:', rawBookingId);
+      setError('This booking was created when the database was unavailable. Unfortunately, rescheduling is not available for this booking. Please contact us directly to reschedule.');
       setLoading(false);
       return;
     }
@@ -83,6 +106,8 @@ export function RescheduleBooking() {
           // Show more detailed error message
           if (fetchError.code === 'PGRST116') {
             setError('Booking not found. It may have already been cancelled.');
+          } else if (fetchError.message?.includes('invalid input syntax for uuid')) {
+            setError('Invalid booking ID. This booking was created when the database was unavailable. Please contact us directly to reschedule.');
           } else if (fetchError.message?.includes('permission') || fetchError.message?.includes('policy')) {
             setError('Permission denied. Please check your database policies.');
           } else {
@@ -120,7 +145,7 @@ export function RescheduleBooking() {
     };
 
     fetchBooking();
-  }, [bookingId]);
+  }, [bookingId, rawBookingId]);
 
   // Fetch booked time slots when date changes
   useEffect(() => {

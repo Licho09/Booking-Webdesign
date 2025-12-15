@@ -42,3 +42,4 @@ curl -X GET "https://agtrmlktcxwkksclhknn.supabase.co/functions/v1/check-and-sen
 4. CORS or authentication issue
 
 
+
