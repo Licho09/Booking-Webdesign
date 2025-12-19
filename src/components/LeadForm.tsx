@@ -318,15 +318,19 @@ export function LeadForm() {
 
     // Send email confirmation with booking ID (if available)
     console.log('📧 Sending email with booking ID:', bookingId);
-    console.log('📱 Form phone value before trim:', formData.phone);
-    console.log('📱 Form phone value after trim:', formData.phone.trim());
-    console.log('📱 Form phone truthy after trim:', !!formData.phone.trim());
+    console.log('📱 DEBUG - Full formData object:', formData);
+    console.log('📱 Form phone value (raw):', formData.phone);
+    console.log('📱 Form phone value (trimmed):', formData.phone ? formData.phone.trim() : 'NULL/UNDEFINED');
+    console.log('📱 Form phone truthy:', !!formData.phone);
+    console.log('📱 Form phone length:', formData.phone ? formData.phone.length : 0);
     let emailSent = false;
     if (formData.email.trim()) {
       try {
         // Always pass phone, even if empty, so it's included in the request
-        const phoneValue = formData.phone.trim();
+        const phoneValue = formData.phone ? formData.phone.trim() : '';
         console.log('📱 Phone value being passed to sendEmailConfirmation:', phoneValue);
+        console.log('📱 Phone value type:', typeof phoneValue);
+        console.log('📱 Phone value length:', phoneValue.length);
         const emailResult = await sendEmailConfirmation(
           formData.email.trim(),
           formData.name.trim(),
