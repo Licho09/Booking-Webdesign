@@ -51,7 +51,9 @@ export async function sendEmailConfirmation(
     if (businessName) requestBody.businessName = businessName;
     if (bookingId) requestBody.bookingId = bookingId;
     // Always include phone, even if empty, so we can see what's being sent
-    requestBody.phone = phone || '';
+    requestBody.phone = phone !== undefined && phone !== null ? phone : '';
+    console.log('📱 Phone in requestBody:', requestBody.phone);
+    console.log('📱 Phone type in requestBody:', typeof requestBody.phone);
     
     console.log('📤 Request body being sent:', JSON.stringify(requestBody, null, 2));
     

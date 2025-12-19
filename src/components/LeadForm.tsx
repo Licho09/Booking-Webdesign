@@ -324,7 +324,8 @@ export function LeadForm() {
     let emailSent = false;
     if (formData.email.trim()) {
       try {
-        const phoneValue = formData.phone.trim() || undefined;
+        // Always pass phone, even if empty, so it's included in the request
+        const phoneValue = formData.phone.trim();
         console.log('📱 Phone value being passed to sendEmailConfirmation:', phoneValue);
         const emailResult = await sendEmailConfirmation(
           formData.email.trim(),
@@ -333,7 +334,7 @@ export function LeadForm() {
           selectedTime,
           formData.businessName.trim() || undefined,
           bookingId || undefined,
-          phoneValue
+          phoneValue || undefined
         );
         emailSent = emailResult.success;
         if (!emailResult.success) {
