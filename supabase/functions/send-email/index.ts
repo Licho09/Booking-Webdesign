@@ -79,7 +79,11 @@ serve(async (req) => {
     
     console.log('📥 Raw request body:', JSON.stringify(requestBody, null, 2));
     const { email, name, date, time, businessName, bookingId, phone }: EmailRequest = requestBody;
-    console.log('Request data received:', { email, name, date, time, businessName, bookingId });
+    console.log('Request data received:', { email, name, date, time, businessName, bookingId, phone });
+    console.log('📱 Phone number received:', phone);
+    console.log('📱 Phone number type:', typeof phone);
+    console.log('📱 Phone number truthy:', !!phone);
+    console.log('📱 Phone number after trim check:', phone && phone.trim() ? phone.trim() : 'EMPTY OR UNDEFINED');
     console.log('📋 Booking ID in email function:', bookingId);
     console.log('📋 Booking ID type:', typeof bookingId);
     console.log('📋 Booking ID truthy?', !!bookingId);
@@ -270,7 +274,7 @@ DesignCXLabs
       <h2 style="margin-top: 0; color: #667eea; font-size: 20px;">📋 Lead Details</h2>
       <p style="margin: 10px 0;"><strong>Name:</strong> ${name}</p>
       <p style="margin: 10px 0;"><strong>Email:</strong> <a href="mailto:${email}" style="color: #667eea; text-decoration: none;">${email}</a></p>
-      <p style="margin: 10px 0;"><strong>Phone:</strong> ${phone ? `<a href="tel:${phone}" style="color: #667eea; text-decoration: none;">${phone}</a>` : 'Not provided'}</p>
+      <p style="margin: 10px 0;"><strong>Phone:</strong> ${phone && phone.trim() ? `<a href="tel:${phone.trim()}" style="color: #667eea; text-decoration: none;">${phone.trim()}</a>` : 'Not provided'}</p>
       <p style="margin: 10px 0;"><strong>Business:</strong> ${businessName || 'Not provided'}</p>
     </div>
     
@@ -303,7 +307,7 @@ You have a new booking request!
 📋 Lead Details
 Name: ${name}
 Email: ${email}
-Phone: ${phone || 'Not provided'}
+Phone: ${phone && phone.trim() ? phone.trim() : 'Not provided'}
 Business: ${businessName || 'Not provided'}
 
 📅 Appointment Details
