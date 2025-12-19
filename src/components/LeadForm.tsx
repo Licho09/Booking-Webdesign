@@ -318,9 +318,14 @@ export function LeadForm() {
 
     // Send email confirmation with booking ID (if available)
     console.log('📧 Sending email with booking ID:', bookingId);
+    console.log('📱 Form phone value before trim:', formData.phone);
+    console.log('📱 Form phone value after trim:', formData.phone.trim());
+    console.log('📱 Form phone truthy after trim:', !!formData.phone.trim());
     let emailSent = false;
     if (formData.email.trim()) {
       try {
+        const phoneValue = formData.phone.trim() || undefined;
+        console.log('📱 Phone value being passed to sendEmailConfirmation:', phoneValue);
         const emailResult = await sendEmailConfirmation(
           formData.email.trim(),
           formData.name.trim(),
@@ -328,7 +333,7 @@ export function LeadForm() {
           selectedTime,
           formData.businessName.trim() || undefined,
           bookingId || undefined,
-          formData.phone.trim() || undefined
+          phoneValue
         );
         emailSent = emailResult.success;
         if (!emailResult.success) {

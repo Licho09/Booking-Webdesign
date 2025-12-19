@@ -21,10 +21,13 @@ export async function sendEmailConfirmation(
   }
 
   try {
-    console.log('📝 Email data:', { email, name, date, time, businessName, bookingId });
+    console.log('📝 Email data:', { email, name, date, time, businessName, bookingId, phone });
     console.log('📋 Booking ID value:', bookingId);
     console.log('📋 Booking ID type:', typeof bookingId);
     console.log('📋 Booking ID truthy?', !!bookingId);
+    console.log('📱 Phone number received:', phone);
+    console.log('📱 Phone number type:', typeof phone);
+    console.log('📱 Phone number truthy?', !!phone);
     
     // Get the Supabase URL and anon key for direct fetch
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -47,7 +50,8 @@ export async function sendEmailConfirmation(
     };
     if (businessName) requestBody.businessName = businessName;
     if (bookingId) requestBody.bookingId = bookingId;
-    if (phone) requestBody.phone = phone;
+    // Always include phone, even if empty, so we can see what's being sent
+    requestBody.phone = phone || '';
     
     console.log('📤 Request body being sent:', JSON.stringify(requestBody, null, 2));
     
