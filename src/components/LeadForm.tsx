@@ -327,7 +327,8 @@ export function LeadForm() {
           dateString,
           selectedTime,
           formData.businessName.trim() || undefined,
-          bookingId || undefined
+          bookingId || undefined,
+          formData.phone.trim() || undefined
         );
         emailSent = emailResult.success;
         if (!emailResult.success) {

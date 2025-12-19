@@ -9,7 +9,8 @@ export async function sendEmailConfirmation(
   date: string,
   time: string,
   businessName?: string,
-  bookingId?: string
+  bookingId?: string,
+  phone?: string
 ): Promise<{ success: boolean; error?: string }> {
   console.log('📧 Attempting to send email confirmation...');
   
@@ -46,6 +47,7 @@ export async function sendEmailConfirmation(
     };
     if (businessName) requestBody.businessName = businessName;
     if (bookingId) requestBody.bookingId = bookingId;
+    if (phone) requestBody.phone = phone;
     
     console.log('📤 Request body being sent:', JSON.stringify(requestBody, null, 2));
     
