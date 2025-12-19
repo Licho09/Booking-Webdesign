@@ -552,7 +552,7 @@ export function LeadForm() {
               <input
                 type="text"
                 name="businessName"
-                placeholder="Website idea / business name"
+                placeholder="Contracting business type (roofing, landscaping, etc.)"
                 value={formData.businessName}
                 onChange={handleChange}
                 required
