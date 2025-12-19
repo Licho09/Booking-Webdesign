@@ -62,3 +62,4 @@ Once Supabase CLI is installed, continue with the deployment steps in `DEPLOY_FU
 
 
 
+

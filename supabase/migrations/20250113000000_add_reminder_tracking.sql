@@ -1,4 +1,4 @@
-/*
+`/*
   # Add reminder tracking columns to prevent duplicate emails
 
   1. New Columns
@@ -24,3 +24,4 @@ CREATE INDEX IF NOT EXISTS idx_leads_reminder_starting_soon_sent
 ON leads(reminder_starting_soon_sent_at) 
 WHERE reminder_starting_soon_sent_at IS NOT NULL;
 
+`

@@ -141,15 +141,39 @@ serve(async (req) => {
       if (!booking.booking_date || !booking.booking_time) continue;
 
       const hoursUntil = getHoursUntilBooking(booking.booking_date, booking.booking_time);
+      const minutesUntil = hoursUntil * 60;
       const formattedDate = formatDateForDisplay(booking.booking_date);
+      
+      // Log all bookings for debugging (only if within reminder windows)
+      if (hoursUntil >= 0.05 && hoursUntil <= 0.33) {
+        console.log(`🔍 Booking ${booking.id}: ${minutesUntil.toFixed(0)} minutes until (${booking.booking_date} ${booking.booking_time})`);
+      }
 
       try {
         // Check if we need to send 1-day reminder (23-25 hours before)
         // Only send if we haven't already sent one
         if (hoursUntil >= 23 && hoursUntil <= 25 && !booking.reminder_1day_sent_at) {
-          console.log(`📧 Sending 1-day reminder for booking ${booking.id} (${hoursUntil.toFixed(1)} hours until)`);
+          console.log(`📧 Attempting to send 1-day reminder for booking ${booking.id} (${hoursUntil.toFixed(1)} hours until)`);
           
-          // Call the 1-day reminder function
+          // CRITICAL: Update database FIRST to prevent race conditions
+          // This atomic update will only succeed if reminder_1day_sent_at is still NULL
+          const now = new Date().toISOString();
+          const { data: updateData, error: updateError } = await supabase
+            .from('leads')
+            .update({ reminder_1day_sent_at: now })
+            .eq('id', booking.id)
+            .is('reminder_1day_sent_at', null)
+            .select();
+          
+          // If update failed or returned no rows, another process already sent the reminder
+          if (updateError || !updateData || updateData.length === 0) {
+            console.log(`⏭️ Skipping 1-day reminder for booking ${booking.id} - already being processed or sent`);
+            continue;
+          }
+          
+          console.log(`🔒 Locked booking ${booking.id} for 1-day reminder`);
+          
+          // Now send the email
           const reminderUrl = `${FUNCTION_BASE_URL}/functions/v1/send-reminder-1day`;
           const reminderResponse = await fetch(reminderUrl, {
             method: 'POST',
@@ -169,33 +193,47 @@ serve(async (req) => {
           });
 
           if (reminderResponse.ok) {
-            // Mark reminder as sent in database
-            const { error: updateError } = await supabase
-              .from('leads')
-              .update({ reminder_1day_sent_at: new Date().toISOString() })
-              .eq('id', booking.id);
-            
-            if (updateError) {
-              console.error(`⚠️ Failed to update reminder_1day_sent_at for booking ${booking.id}:`, updateError);
-            }
-            
             results.reminders1Day.push(booking.id);
             console.log(`✅ 1-day reminder sent for booking ${booking.id}`);
           } else {
+            // Email failed, but we already marked it as sent
+            // We could reset reminder_1day_sent_at here, but that might cause infinite retries
+            // Better to log the error and move on
             const errorData = await reminderResponse.json().catch(() => ({}));
             results.errors.push(`Failed to send 1-day reminder for ${booking.id}: ${JSON.stringify(errorData)}`);
             console.error(`❌ Failed to send 1-day reminder for ${booking.id}:`, errorData);
+            console.error(`⚠️ Note: Database already marked as sent, so this won't retry automatically`);
           }
         } else if (hoursUntil >= 23 && hoursUntil <= 25 && booking.reminder_1day_sent_at) {
           console.log(`⏭️ Skipping 1-day reminder for booking ${booking.id} - already sent at ${booking.reminder_1day_sent_at}`);
         }
 
-        // Check if we need to send starting soon reminder (5-15 minutes before, or 0.08-0.25 hours)
+        // Check if we need to send starting soon reminder (3-20 minutes before, or 0.05-0.33 hours)
+        // Expanded window to account for 15-minute cron job frequency
         // Only send if we haven't already sent one
-        if (hoursUntil >= 0.08 && hoursUntil <= 0.25 && !booking.reminder_starting_soon_sent_at) {
-          console.log(`📧 Sending starting soon reminder for booking ${booking.id} (${hoursUntil.toFixed(2)} hours = ${(hoursUntil * 60).toFixed(0)} minutes until)`);
+        if (hoursUntil >= 0.05 && hoursUntil <= 0.33 && !booking.reminder_starting_soon_sent_at) {
+          const minutesUntil = hoursUntil * 60;
+          console.log(`📧 Attempting to send starting soon reminder for booking ${booking.id} (${minutesUntil.toFixed(0)} minutes until)`);
           
-          // Call the starting soon reminder function
+          // CRITICAL: Update database FIRST to prevent race conditions
+          // This atomic update will only succeed if reminder_starting_soon_sent_at is still NULL
+          const now = new Date().toISOString();
+          const { data: updateData, error: updateError } = await supabase
+            .from('leads')
+            .update({ reminder_starting_soon_sent_at: now })
+            .eq('id', booking.id)
+            .is('reminder_starting_soon_sent_at', null)
+            .select();
+          
+          // If update failed or returned no rows, another process already sent the reminder
+          if (updateError || !updateData || updateData.length === 0) {
+            console.log(`⏭️ Skipping starting soon reminder for booking ${booking.id} - already being processed or sent`);
+            continue;
+          }
+          
+          console.log(`🔒 Locked booking ${booking.id} for starting soon reminder`);
+          
+          // Now send the email
           const startingSoonUrl = `${FUNCTION_BASE_URL}/functions/v1/send-reminder-starting-soon`;
           const startingSoonResponse = await fetch(startingSoonUrl, {
             method: 'POST',
@@ -214,25 +252,20 @@ serve(async (req) => {
           });
 
           if (startingSoonResponse.ok) {
-            // Mark reminder as sent in database
-            const { error: updateError } = await supabase
-              .from('leads')
-              .update({ reminder_starting_soon_sent_at: new Date().toISOString() })
-              .eq('id', booking.id);
-            
-            if (updateError) {
-              console.error(`⚠️ Failed to update reminder_starting_soon_sent_at for booking ${booking.id}:`, updateError);
-            }
-            
             results.remindersStartingSoon.push(booking.id);
             console.log(`✅ Starting soon reminder sent for booking ${booking.id}`);
           } else {
+            // Email failed, but we already marked it as sent
+            // We could reset reminder_starting_soon_sent_at here, but that might cause infinite retries
+            // Better to log the error and move on
             const errorData = await startingSoonResponse.json().catch(() => ({}));
             results.errors.push(`Failed to send starting soon reminder for ${booking.id}: ${JSON.stringify(errorData)}`);
             console.error(`❌ Failed to send starting soon reminder for ${booking.id}:`, errorData);
+            console.error(`⚠️ Note: Database already marked as sent, so this won't retry automatically`);
           }
-        } else if (hoursUntil >= 0.08 && hoursUntil <= 0.25 && booking.reminder_starting_soon_sent_at) {
-          console.log(`⏭️ Skipping starting soon reminder for booking ${booking.id} - already sent at ${booking.reminder_starting_soon_sent_at}`);
+        } else if (hoursUntil >= 0.05 && hoursUntil <= 0.33 && booking.reminder_starting_soon_sent_at) {
+          const minutesUntil = hoursUntil * 60;
+          console.log(`⏭️ Skipping starting soon reminder for booking ${booking.id} - already sent at ${booking.reminder_starting_soon_sent_at} (${minutesUntil.toFixed(0)} minutes until)`);
         }
       } catch (error) {
         const errorMsg = error instanceof Error ? error.message : String(error);
