@@ -477,9 +477,6 @@ export function LeadForm() {
       <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-white font-semibold mb-6 text-center fade-in-slide-up-delay-3 px-2">
         👇 Book a Free Strategy Call 👇
       </p>
-      <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-white font-semibold mb-3 text-center fade-in-slide-up-delay-3 px-2 underline">
-        Designed for contractors doing $10k+/month
-      </p>
       <div className="bg-white rounded-2xl shadow-2xl overflow-hidden slide-up">
         <div className="grid lg:grid-cols-2 gap-0">
           {/* Left Panel - Event Details (Form) - Hidden on mobile until Continue is clicked */}
