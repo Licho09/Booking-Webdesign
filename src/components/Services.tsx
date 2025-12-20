@@ -38,7 +38,7 @@ export function Services() {
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
       <div className="text-center mb-8 sm:mb-10 lg:mb-12">
         <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 sm:mb-5 lg:mb-6 px-4">
-          What I Can Do <span className="text-red-500 text-4xl sm:text-5xl lg:text-6xl">For You</span>
+          How We Get You <span className="text-red-500 text-4xl sm:text-5xl lg:text-6xl">Booked Appointments</span>
         </h2>
         <p className="text-base sm:text-lg lg:text-xl text-white/90 max-w-3xl mx-auto px-4">
           I combine design, automation, and marketing to help your business grow faster and work smarter.
