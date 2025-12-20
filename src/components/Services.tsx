@@ -1,36 +1,26 @@
 import SpotlightCard from './SpotlightCard';
 
 export function Services() {
-  const services = [
+  const steps = [
     {
-      emoji: '🖥️',
-      title: 'Website Design',
-      description: 'Modern, mobile-first websites that turn visitors into paying clients.',
+      number: '1',
+      title: 'High-Converting Page',
+      description: 'A simple page that turns visitors into booked appointments.',
     },
     {
-      emoji: '🧭',
-      title: 'SEO & Google Setup',
-      description: 'Make sure your business shows up when people search for what you offer.',
+      number: '2',
+      title: 'Ads That Bring Qualified Leads',
+      description: 'Ads reach local people actively searching for your services, ready to schedule a call.',
     },
     {
-      emoji: '🤖',
-      title: 'AI Chat & Automation',
-      description: 'Add simple AI bots to answer questions, collect leads, and follow up 24/7.',
+      number: '3',
+      title: 'Automated Follow-Ups',
+      description: 'Reminders and follow-ups ensure booked leads actually show up.',
     },
     {
-      emoji: '📣',
-      title: 'Ads & Funnels',
-      description: 'Launch ad campaigns that drive real traffic straight to your site — and convert.',
-    },
-    {
-      emoji: '💬',
-      title: 'Ongoing Support',
-      description: 'I stay available for updates, improvements, and strategy so your website keeps performing.',
-    },
-    {
-      emoji: '📊',
-      title: 'Analytics & Performance Analysis',
-      description: "Understand and improve your website's health and functionality so you can continue to rank well in search results.",
+      number: '4',
+      title: 'Track & Optimize',
+      description: 'We monitor results and adjust strategies so you consistently book more appointments.',
     },
   ];
 
@@ -40,26 +30,36 @@ export function Services() {
         <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 sm:mb-5 lg:mb-6 px-4">
           How We Get You <span className="text-red-500 text-4xl sm:text-5xl lg:text-6xl">Booked Appointments</span>
         </h2>
-        <p className="text-base sm:text-lg lg:text-xl text-white/90 max-w-3xl mx-auto px-4">
-          I combine design, automation, and marketing to help your business grow faster and work smarter.
-        </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-        {services.map((service, index) => (
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 max-w-5xl mx-auto mb-8">
+        {steps.map((step, index) => (
           <SpotlightCard 
             key={index}
-            className="custom-spotlight-card aspect-square flex flex-col justify-center" 
+            className="custom-spotlight-card flex flex-col justify-center p-6 sm:p-8" 
             spotlightColor="rgba(255, 255, 255, 0.25)"
           >
-            <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-3 sm:mb-4 text-center relative z-10">
-              {service.title}
-            </h3>
-            <p className="text-white/80 leading-relaxed text-center text-sm sm:text-base lg:text-lg relative z-10">
-              {service.description}
-            </p>
+            <div className="flex items-start gap-4">
+              <div className="text-4xl sm:text-5xl lg:text-6xl font-bold text-red-500 flex-shrink-0">
+                {step.number}
+              </div>
+              <div className="flex-1">
+                <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-3 relative z-10">
+                  {step.title}
+                </h3>
+                <p className="text-white/80 leading-relaxed text-sm sm:text-base lg:text-lg relative z-10">
+                  {step.description}
+                </p>
+              </div>
+            </div>
           </SpotlightCard>
         ))}
+      </div>
+
+      <div className="text-center mt-8">
+        <p className="text-base sm:text-lg text-white/70 max-w-2xl mx-auto px-4">
+          No complicated software — we handle setup and optimization so you can focus on your work.
+        </p>
       </div>
     </section>
   );

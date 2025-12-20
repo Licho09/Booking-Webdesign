@@ -11,8 +11,8 @@ export function Hero() {
       </div>
       <div className="space-y-6">
         <h1 className="text-3xl lg:text-4xl xl:text-5xl font-bold text-white leading-tight max-w-5xl mx-auto fade-in-slide-up-delay-1">
-          <span className="block lg:inline">Book Up to 20 Qualified Appointments</span>{' '}
-          <span className="block lg:inline">in 90 Days — Without Chasing Leads</span>
+          <span className="block lg:inline">Book Up to <span className="bg-white/20 px-3 py-1 rounded-lg">20</span> Qualified Appointments</span>{' '}
+          <span className="block lg:inline">in <span className="bg-white/20 px-3 py-1 rounded-lg">90</span> Days — <span className="text-red-500">Without Chasing Leads</span></span>
         </h1>
       </div>
     </section>
