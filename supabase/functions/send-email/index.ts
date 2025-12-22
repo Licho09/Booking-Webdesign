@@ -131,7 +131,7 @@ serve(async (req) => {
     
     <p style="font-size: 16px; margin: 20px 0;">We're scheduled to talk on <strong>${date}</strong> at <strong>${time}</strong>.</p>
     
-    <p style="font-size: 16px; margin: 20px 0;">On the call, we'll go over how we help local contractors get more leads using high-converting websites and automation.</p>
+    <p style="font-size: 16px; margin: 20px 0;">On the call, we'll go over how we help spray foam contractors get more leads using high-converting websites and automation.</p>
     
     ${MEETING_LINK ? `
     <div style="margin: 30px 0; text-align: center;">
@@ -175,7 +175,7 @@ You're all set.
 
 We're scheduled to talk on ${date} at ${time}.
 
-On the call, we'll go over how we help local contractors get more leads using high-converting websites and automation.
+On the call, we'll go over how we help spray foam contractors get more leads using high-converting websites and automation.
 
 ${MEETING_LINK ? `Join link: ${MEETING_LINK}` : ''}
 

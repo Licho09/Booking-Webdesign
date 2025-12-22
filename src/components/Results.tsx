@@ -3,7 +3,7 @@ import { TrendingUp } from 'lucide-react';
 export function Results() {
   const results = [
     {
-      title: 'Local Contractor',
+      title: 'Spray Foam Contractor',
       result: '+42% inbound job requests in 60 days',
     },
     {

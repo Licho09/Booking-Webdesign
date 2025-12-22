@@ -149,8 +149,8 @@ export function LeadForm() {
 
     trackFormSubmitAttempt();
 
-    if (!formData.name || !formData.email || !formData.phone || !formData.businessName || !selectedTime) {
-      setError('Please fill in all fields and select a time.');
+    if (!formData.name || !formData.email || !formData.phone || !selectedTime) {
+      setError('Please fill in all required fields and select a time.');
       trackFormSubmitError('missing_fields');
       return;
     }
@@ -494,7 +494,7 @@ export function LeadForm() {
               </button>
             )}
             <div className="text-2xl lg:text-3xl font-bold text-red-500 mb-2">Get Started!</div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">Free Contractor Growth Call</h3>
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">Free Spray Foam Growth Call</h3>
             
             <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-6">
               <p className="text-sm text-amber-800 font-medium">
@@ -549,16 +549,15 @@ export function LeadForm() {
               <input
                 type="text"
                 name="businessName"
-                placeholder="Contracting business type (roofing, landscaping, etc.)"
+                placeholder="Business Name (Optional)"
                 value={formData.businessName}
                 onChange={handleChange}
-                required
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all"
               />
               {error && <p className="text-red-600 text-sm">{error}</p>}
               <button
                 type="submit"
-                disabled={isSubmitting || !selectedTime || !formData.name || !formData.email || !formData.phone || !formData.businessName}
+                disabled={isSubmitting || !selectedTime || !formData.name || !formData.email || !formData.phone}
                 className="submit-button relative overflow-hidden h-12 px-8 rounded-3xl bg-[#3d3a4e] text-white border-none cursor-pointer text-xl font-bold w-full disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{
                   backgroundSize: '400%'
