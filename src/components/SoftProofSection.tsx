@@ -18,6 +18,9 @@ export function SoftProofSection() {
           </div>
         ))}
       </div>
+      <div className="relative left-1/2 -translate-x-1/2 w-[95%] mt-8">
+        <hr className="border-white/30" />
+      </div>
     </section>
   );
 }
