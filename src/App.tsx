@@ -59,10 +59,10 @@ function HomePage() {
       <main>
         <Hero />
         <TrustSection />
-        <ProblemSolutionSection />
         <Services />
         <SoftProofSection />
         <LeadForm />
+        <ProblemSolutionSection />
       </main>
     </div>
   );

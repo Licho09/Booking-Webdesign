@@ -4,18 +4,18 @@ export function Services() {
   const steps = [
     {
       number: '1',
-      title: 'Launch targeted local ads',
-      description: 'Ads that reach local homeowners actively searching for spray foam services.',
+      title: 'Targeted Ads',
+      description: 'We run local ads that reach serious homeowners actively looking for spray foam services.',
     },
     {
       number: '2',
-      title: 'Leads book directly on your calendar',
-      description: 'A simple page that pre-qualifies leads and turns visitors into booked appointments.',
+      title: 'Leads Schedule',
+      description: 'Interested homeowners book directly on your calendar, no back-and-forth needed.',
     },
     {
       number: '3',
-      title: 'You show up and close the job',
-      description: 'Automatic reminders ensure booked leads actually show up, so you can focus on closing.',
+      title: 'Close Jobs',
+      description: 'You show up and close the job while automatic reminders ensure leads actually show up.',
     },
   ];
 

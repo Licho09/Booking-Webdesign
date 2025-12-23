@@ -3,14 +3,30 @@ export function TrustSection() {
     <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
       <div className="flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-8 fade-in-slide-up">
         {/* Circular Image */}
-        <div className="flex-shrink-0">
+        <div 
+          className="flex-shrink-0"
+          style={{
+            WebkitTouchCallout: 'none',
+            WebkitUserSelect: 'none',
+            userSelect: 'none',
+          }}
+        >
           <img 
             src="/luis-photo.png" 
             alt="Luis - Founder of DesignLabs" 
             loading="lazy"
             width="200"
             height="200"
-            className="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 rounded-full object-cover object-top shadow-xl border-4 border-white/20"
+            draggable="false"
+            className="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 rounded-full object-cover object-top shadow-xl border-4 border-white/20 select-none pointer-events-auto"
+            style={{
+              WebkitTouchCallout: 'none',
+              WebkitUserSelect: 'none',
+              userSelect: 'none',
+              touchAction: 'manipulation',
+            }}
+            onContextMenu={(e) => e.preventDefault()}
+            onDragStart={(e) => e.preventDefault()}
             onError={(e) => {
               // Fallback if image doesn't exist
               const target = e.target as HTMLImageElement;
@@ -46,6 +62,9 @@ export function TrustSection() {
             </div>
           </div>
         </div>
+      </div>
+      <div className="relative left-1/2 -translate-x-1/2 w-[95%] mt-8">
+        <hr className="border-white/30" />
       </div>
     </section>
   );
