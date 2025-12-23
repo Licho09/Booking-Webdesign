@@ -8,13 +8,8 @@ export default defineConfig({
     exclude: ['lucide-react'],
   },
   build: {
-    // Minify CSS and JS
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true, // Remove console.log in production
-      },
-    },
+    // Use esbuild for minification (faster and included with Vite)
+    minify: 'esbuild',
     // Optimize chunk splitting
     rollupOptions: {
       output: {
