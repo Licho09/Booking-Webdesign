@@ -81,3 +81,4 @@ After image optimization + cache headers:
 
 The cache headers are now in place. After you push and deploy, they'll automatically work. The biggest remaining improvement is optimizing your images!
 
+

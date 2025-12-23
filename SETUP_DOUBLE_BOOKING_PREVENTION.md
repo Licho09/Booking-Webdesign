@@ -63,3 +63,4 @@ The RLS policy allows anonymous users to read booking information. This is neces
 - Check Supabase table to see if data is being saved correctly
 
 
+
