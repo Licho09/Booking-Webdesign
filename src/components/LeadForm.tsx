@@ -475,13 +475,13 @@ export function LeadForm() {
   return (
     <section id="offer" className="max-w-5xl mx-auto px-8 py-8">
       <div className="text-center mb-8 fade-in-slide-up-delay-3">
-        <p className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white mb-4 px-2 tracking-wide flex items-center justify-center gap-3">
-          <span className="text-3xl">👇</span>
-          <span className="bg-gradient-to-r from-red-500 to-red-600 bg-clip-text text-transparent drop-shadow-lg">
+        <p className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-white mb-4 px-2 tracking-wide flex items-center justify-center gap-2 sm:gap-3 flex-wrap">
+          <span className="text-2xl sm:text-3xl">👇</span>
+          <span className="bg-gradient-to-r from-red-500 to-red-600 bg-clip-text text-transparent drop-shadow-lg whitespace-nowrap">
             BOOK NOW
           </span>
           <span className="text-red-500 ml-2">!</span>
-          <span className="text-3xl">👇</span>
+          <span className="text-2xl sm:text-3xl">👇</span>
         </p>
       </div>
       <div className="bg-white rounded-2xl shadow-2xl overflow-hidden slide-up">
