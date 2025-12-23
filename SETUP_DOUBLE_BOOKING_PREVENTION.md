@@ -62,3 +62,4 @@ The RLS policy allows anonymous users to read booking information. This is neces
 - Verify the date format matches (YYYY-MM-DD)
 - Check Supabase table to see if data is being saved correctly
 
+

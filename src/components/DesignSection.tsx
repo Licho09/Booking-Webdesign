@@ -9,8 +9,11 @@ export function DesignSection() {
         {/* Image on the left */}
         <div className={`flex justify-center lg:justify-start ${isVisible ? 'slide-in-right' : 'scroll-animate-hidden'}`}>
           <img 
-            src="/design-image.png" 
+            src="/design-image.jpg" 
             alt="UX/UI Design" 
+            loading="lazy"
+            width="600"
+            height="600"
             className="w-full max-w-md lg:max-w-lg rounded-full aspect-square object-cover shadow-2xl"
             onError={(e) => {
               // Fallback if image doesn't exist

@@ -16,8 +16,11 @@ export function LeadsSection() {
         {/* Image on the right */}
         <div className={`flex justify-center lg:justify-end order-1 lg:order-2 ${isVisible ? 'slide-in-left' : 'scroll-animate-hidden'}`}>
           <img 
-            src="/leads-image.png" 
+            src="/leads-image.jpg" 
             alt="Get Real Leads" 
+            loading="lazy"
+            width="600"
+            height="600"
             className="w-full max-w-md lg:max-w-lg rounded-full aspect-square object-cover shadow-2xl"
             onError={(e) => {
               // Fallback if image doesn't exist
