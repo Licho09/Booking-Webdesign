@@ -4,23 +4,18 @@ export function Services() {
   const steps = [
     {
       number: '1',
-      title: 'High-Converting Page',
-      description: 'A simple page that turns visitors into booked appointments.',
+      title: 'Launch targeted local ads',
+      description: 'Ads that reach local homeowners actively searching for spray foam services.',
     },
     {
       number: '2',
-      title: 'Ads That Bring Qualified Leads',
-      description: 'Ads reach local people actively searching for your services, ready to schedule a call.',
+      title: 'Leads book directly on your calendar',
+      description: 'A simple page that pre-qualifies leads and turns visitors into booked appointments.',
     },
     {
       number: '3',
-      title: 'Automated Follow-Ups',
-      description: 'Reminders and follow-ups ensure booked leads actually show up.',
-    },
-    {
-      number: '4',
-      title: 'Track & Optimize',
-      description: 'We monitor results and adjust strategies so you consistently book more appointments.',
+      title: 'You show up and close the job',
+      description: 'Automatic reminders ensure booked leads actually show up, so you can focus on closing.',
     },
   ];
 
@@ -28,11 +23,11 @@ export function Services() {
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
       <div className="text-center mb-8 sm:mb-10 lg:mb-12">
         <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 sm:mb-5 lg:mb-6 px-4">
-          How We Get You <span className="text-red-500 text-4xl sm:text-5xl lg:text-6xl">Booked Appointments</span>
+          How It Works
         </h2>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 max-w-5xl mx-auto mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 max-w-6xl mx-auto mb-8">
         {steps.map((step, index) => (
           <SpotlightCard 
             key={index}
@@ -57,8 +52,8 @@ export function Services() {
       </div>
 
       <div className="text-center mt-8">
-        <p className="text-base sm:text-lg text-white/70 max-w-2xl mx-auto px-4">
-          No complicated software — we handle setup and optimization so you can focus on your work.
+        <p className="text-lg sm:text-xl text-white/90 max-w-3xl mx-auto px-4 font-medium">
+          We handle setup and optimization — you focus on installs.
         </p>
       </div>
     </section>

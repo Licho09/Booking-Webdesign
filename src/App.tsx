@@ -3,15 +3,14 @@ import { Routes, Route, useLocation } from 'react-router-dom';
 import Lenis from 'lenis';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
-import { LeadForm } from './components/LeadForm';
+import { TrustSection } from './components/TrustSection';
+import { ProblemSolutionSection } from './components/ProblemSolutionSection';
 import { Services } from './components/Services';
-import { DesignSection } from './components/DesignSection';
-import { LeadsSection } from './components/LeadsSection';
-import { ToolsSection } from './components/ToolsSection';
+import { SoftProofSection } from './components/SoftProofSection';
+import { LeadForm } from './components/LeadForm';
 import { ThankYou } from './components/ThankYou';
 import { CancelBooking } from './components/CancelBooking';
 import { RescheduleBooking } from './components/RescheduleBooking';
-import CurvedLoop from './components/CurvedLoop';
 import { useScrollbarDetection } from './hooks/useScrollbarDetection';
 import { trackPageView } from './lib/analytics';
 
@@ -59,20 +58,11 @@ function HomePage() {
       <Header />
       <main>
         <Hero />
-        <LeadForm />
+        <TrustSection />
+        <ProblemSolutionSection />
         <Services />
-        <DesignSection />
-        <LeadsSection />
-        <ToolsSection />
-        <div className="py-16">
-          <CurvedLoop 
-            marqueeText="Clients ✦ Sales ✦ Leads ✦ Bookings ✦ Growth ✦"
-            speed={3}
-            curveAmount={500}
-            direction="right"
-            interactive={true}
-          />
-        </div>
+        <SoftProofSection />
+        <LeadForm />
       </main>
     </div>
   );

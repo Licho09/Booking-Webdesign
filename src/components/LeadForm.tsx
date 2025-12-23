@@ -474,9 +474,11 @@ export function LeadForm() {
 
   return (
     <section id="offer" className="max-w-5xl mx-auto px-8 py-8">
-      <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-white font-semibold mb-6 text-center fade-in-slide-up-delay-3 px-2">
-        👇 Book a Free Strategy Call 👇
-      </p>
+      <div className="text-center mb-8 fade-in-slide-up-delay-3">
+        <p className="text-lg sm:text-xl md:text-2xl text-white/90 mb-4 px-2">
+          This call is for spray foam contractors doing or aiming for $10k+/month. We'll see if this system fits your market.
+        </p>
+      </div>
       <div className="bg-white rounded-2xl shadow-2xl overflow-hidden slide-up">
         <div className="grid lg:grid-cols-2 gap-0">
           {/* Left Panel - Event Details (Form) - Hidden on mobile until Continue is clicked */}
@@ -554,6 +556,9 @@ export function LeadForm() {
                 onChange={handleChange}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all"
               />
+              <p className="text-sm text-gray-600 italic">
+                We'll text you to confirm
+              </p>
               {error && <p className="text-red-600 text-sm">{error}</p>}
               <button
                 type="submit"
