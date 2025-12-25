@@ -54,15 +54,15 @@ function HomePage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-indigo-900 via-purple-900 to-indigo-950 pb-32">
+    <div className="min-h-screen bg-gradient-to-b from-indigo-900 via-purple-900 to-indigo-950 pb-32 overflow-x-hidden">
       <Header />
-      <main>
+      <main className="overflow-x-hidden">
         <Hero />
-        <TrustSection />
         <Services />
         <SoftProofSection />
         <LeadForm />
         <ProblemSolutionSection />
+        <TrustSection />
       </main>
     </div>
   );

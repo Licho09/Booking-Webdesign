@@ -1,6 +1,6 @@
 export function TrustSection() {
   return (
-    <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+    <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-12 lg:pt-6 lg:pb-16">
       <div className="flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-8 fade-in-slide-up">
         {/* Circular Image */}
         <div 
